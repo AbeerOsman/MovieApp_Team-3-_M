@@ -11,8 +11,9 @@ import SwiftUI
 struct MovieApp_Team_3__MApp: App {
     var body: some Scene {
         WindowGroup {
-            MoviesCenterView()
+            AddReviewView(rating: .constant(3))
                 .preferredColorScheme(.dark)
         }
     }
 }
+
