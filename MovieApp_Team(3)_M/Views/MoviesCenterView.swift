@@ -67,7 +67,7 @@ struct HighRatedMovies: View {
                 //all top reated movies
                 HStack(alignment: .center) {
                     //1st movie
-                    Image(.topGun)
+                    Image("TopGun")
                         .resizable()
                         .scaledToFill()
                         .frame(width: 355, height: 429)

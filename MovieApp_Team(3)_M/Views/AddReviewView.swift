@@ -7,18 +7,18 @@
 import SwiftUI
 struct AddReviewView: View {
     @State private var Review: String = " "
-   @Binding var rating: Int
+    @Binding var rating: Int
     var body: some View {
         VStack{
             HStack(spacing: 78){
                 Button("Back", systemImage: "chevron.backward"){
-               }
+                }
                 .foregroundColor(.yelloww)
                 Text("Write a review")
                     .font(.title2)
                 Button("Add"){
                     
-               }
+                }
                 .foregroundColor(.yelloww)
             }
             Rectangle()
@@ -45,14 +45,14 @@ struct AddReviewView: View {
                 .background(Color.white.opacity(0.1))
                 .cornerRadius(8)
                 .accentColor(.yellow)
-            
+                
                 HStack(spacing: 200){
                     Text("Rating")
                     ReviewModelView(rating: $rating)
-                        
-                   
+                    
+                    
                 }
-            Spacer().frame(height: 410)
+                Spacer().frame(height: 410)
             }
         }
     }
