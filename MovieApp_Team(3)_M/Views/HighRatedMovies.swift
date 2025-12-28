@@ -10,7 +10,7 @@ import SwiftUI
 import SwiftUI
 
 struct HighRatedMovies: View {
-    @StateObject private var viewModel = HighRatedViewModel()
+    @StateObject private var viewModel = MoviesViewModel()
     var highRatedMovies : [MoviesInfo]{
         viewModel.movies.filter { $0.imdbRating >= 5 }
     }

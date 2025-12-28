@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MoviesCenterView: View {
     @State private var searchText = ""
-    @StateObject private var viewModel = HighRatedViewModel()
+    @StateObject private var viewModel = MoviesViewModel()
     
     var body: some View {
         NavigationStack {

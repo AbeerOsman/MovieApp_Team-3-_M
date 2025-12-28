@@ -1,5 +1,5 @@
 //
-//  HighRatedViewModel.swift
+//  MoviesViewModel.swift
 //  MovieApp_Team(3)_M
 //
 //  Created by Abeer Jeilani Osman  on 06/07/1447 AH.
@@ -10,7 +10,7 @@ import Foundation
 import Combine
 
 @MainActor
-class HighRatedViewModel: ObservableObject {
+class MoviesViewModel: ObservableObject {
 
     @Published var movies: [MoviesInfo] = []
     @Published var isLoading = false
