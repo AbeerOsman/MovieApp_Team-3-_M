@@ -31,7 +31,7 @@ var onColor: Color = .yelloww
     }
     func image(for number : Int) ->Image {
         if number > rating {
-            offImage ?? onImage
+            offImage /*?? onImage*/
         } else {
             onImage
         }}}
