@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		8170F8AF2F012C60003BF455 /* Secrets.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 8170F8AE2F012C4A003BF455 /* Secrets.xcconfig */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		8170F8152EFA75B1003BF455 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		8170F8072EFA75B0003BF455 /* MovieApp_Team(3)_M.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "MovieApp_Team(3)_M.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8170F8142EFA75B1003BF455 /* MovieApp_Team(3)_MTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "MovieApp_Team(3)_MTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		8170F81E2EFA75B1003BF455 /* MovieApp_Team(3)_MUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "MovieApp_Team(3)_MUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8170F8AE2F012C4A003BF455 /* Secrets.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -75,6 +80,7 @@
 		8170F7FE2EFA75B0003BF455 = {
 			isa = PBXGroup;
 			children = (
+				8170F8AE2F012C4A003BF455 /* Secrets.xcconfig */,
 				8170F8092EFA75B0003BF455 /* MovieApp_Team(3)_M */,
 				8170F8172EFA75B1003BF455 /* MovieApp_Team(3)_MTests */,
 				8170F8212EFA75B1003BF455 /* MovieApp_Team(3)_MUITests */,
@@ -212,6 +218,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8170F8AF2F012C60003BF455 /* Secrets.xcconfig in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,6 +278,7 @@
 /* Begin XCBuildConfiguration section */
 		8170F8262EFA75B1003BF455 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8170F8AE2F012C4A003BF455 /* Secrets.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -392,14 +400,16 @@
 		};
 		8170F8292EFA75B1003BF455 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8170F8AE2F012C4A003BF455 /* Secrets.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 532LKBA8VZ;
+				DEVELOPMENT_TEAM = F8N3463A3R;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "MovieApp-Team-3--M-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -429,9 +439,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 532LKBA8VZ;
+				DEVELOPMENT_TEAM = F8N3463A3R;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "MovieApp-Team-3--M-Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -456,6 +467,7 @@
 		};
 		8170F82C2EFA75B1003BF455 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8170F8AE2F012C4A003BF455 /* Secrets.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
@@ -500,6 +512,7 @@
 		};
 		8170F82F2EFA75B1003BF455 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8170F8AE2F012C4A003BF455 /* Secrets.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
