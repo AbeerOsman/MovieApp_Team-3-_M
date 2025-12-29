@@ -7,24 +7,33 @@
 import SwiftUI
 struct AddReviewView: View {
     @State private var Review: String = " "
-   @Binding var rating: Int
+    @Binding var rating: Int
     var body: some View {
-        VStack{
-            HStack(spacing: 78){
-                Button("Back", systemImage: "chevron.backward"){
-               }
-                .foregroundColor(.yelloww)
-                Text("Write a review")
-                    .font(.title2)
-                Button("Add"){
-                    
-               }
-                .foregroundColor(.yelloww)
+        NavigationStack {
+            
+        
+            VStack{
+                HStack(spacing: 78){
+                    Button("Back", systemImage: "chevron.backward"){
+                    }
+                    .foregroundColor(.yelloww)
+                    Text("Write a review")
+                        .font(.title2)
+                    Button("Add"){
+                        
+                    }
+                    .foregroundColor(.yelloww)
+                }
+                Rectangle()
+                    .frame(height: 0.3)
+                    .foregroundColor(.gray)
+                Spacer().frame(width: 38, height: 78)
+                
+                
             }
-            Rectangle()
-                .frame(height: 0.3)
-                .foregroundColor(.gray)
-            Spacer().frame(width: 38, height: 78)
+            
+            
+            
             
             VStack(alignment: .leading, spacing: 12){
                 Text("Review")
@@ -45,14 +54,14 @@ struct AddReviewView: View {
                 .background(Color.white.opacity(0.1))
                 .cornerRadius(8)
                 .accentColor(.yellow)
-            
+                
                 HStack(spacing: 200){
                     Text("Rating")
                     ReviewModelView(rating: $rating)
-                        
-                   
+                    
+                    
                 }
-            Spacer().frame(height: 410)
+                Spacer().frame(height: 410)
             }
         }
     }

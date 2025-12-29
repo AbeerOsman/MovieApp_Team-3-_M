@@ -3,165 +3,177 @@
 //  MovieApp_Team(3)_M
 //
 //  Created by Abeer Jeilani Osman  on 03/07/1447 AH.
-//
+//  Check the push 
 
 import SwiftUI
 
 struct MoviesCenterView: View {
     @State private var searchText = ""
+    @StateObject private var viewModel = MoviesViewModel()
+    
     var body: some View {
-        NavigationStack{
-            ScrollView(.vertical){
-                VStack{
-                      HStack{
-                          Text("Movies Center")
-                              .font(.system(size: 28, weight: .bold))
-                          Spacer()
-                                  ZStack{
-                                      Circle()
-                                        .fill(Color.gray.opacity(0.2))
-                                        .frame(width: 41, height: 41)
+        NavigationStack {
+            ScrollView(.vertical, showsIndicators: false) {
+                
+                if !searchText.isEmpty {
+                    FilteredMovieView(
+                        movies: viewModel.movies,
+                        searchText: searchText
+                    )
+                } else {
+                    VStack(spacing: 24) {
+                        HighRatedMovies()
 
-                                      Image(.profileAvatar)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 28.19, height: 31.47)
-                                        .foregroundColor(.brown)
-                                  }
-                              
-                          
-                      }.padding(.horizontal, 16)
-                        .padding(.top, 20)
-                    
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                           .foregroundColor(.gray)
+                        MoviesCategoryView(
+                            title: "Drama",
+                            movies: viewModel.moviesByGenre("Drama"),
+                            isLoading: viewModel.isLoading
+                        )
 
-                        TextField("Search for movie name, actors ...", text: $searchText)
-                              }
-                              .padding(12)
-                              .background(Color(.systemGray6))
-                              .cornerRadius(12)
-                              .padding(.horizontal, 16)
-                    
-                    Spacer()
-                      
-                    HighRatedMovies()
-                      
-                  }
-            }
-            
+                        MoviesCategoryView(
+                            title: "Comedy",
+                            movies: viewModel.moviesByGenre("Comedy"),
+                            isLoading: viewModel.isLoading
+                        )
+                    }
+                }
+                
+            }//to stic the top
+            .safeAreaInset(edge: .top){
+                HeaderView(searchText: $searchText)
+            }.padding()
+        }
+        //featch all data (movies)
+        .task {
+            await viewModel.loadMovies()
         }
     }
-
 }
 
-struct HighRatedMovies: View {
+struct HeaderView: View {
+    @Binding var searchText: String
+    var body: some View {
+            VStack(spacing: 16) {
+                HStack {
+                    Text("Movies Center")
+                        .font(.system(size: 28, weight: .bold))
+                    Spacer()
+                    NavigationLink(destination: ProfileView()
+                        .navigationBarBackButtonHidden(true)){
+                        Circle()
+                            .fill(Color.gray.opacity(0.2))
+                            .frame(width: 41, height: 41)
+                            .overlay(
+                                Image(.profileAvatar)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 28, height: 28)
+                            )
+                    }
+                }
+
+                HStack {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.gray)
+                    TextField("Search for movie name, actors ...", text: $searchText)
+                }
+                .padding(12)
+                .background(Color(.systemGray6))
+                .cornerRadius(12)
+            }.background(
+                Rectangle()
+                    .fill(Color(.black))
+                    .frame(height: 125)
+                    .ignoresSafeArea()
+            )
+        
+        
+    }
+}
+
+
+
+struct MoviesCategoryView: View {
+    let title: String
+    let movies: [MoviesInfo]
+    let isLoading: Bool
+
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
 
-            Text("High Rated")
+            Text(title)
                 .font(.system(size: 22, weight: .semibold))
 
-            ScrollView(.horizontal, showsIndicators: false) {
-                //all top reated movies
-                HStack(alignment: .center) {
-                    //1st movie
-                    Image(.topGun)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(width: 355, height: 429)
-                        .clipped()
-                        .cornerRadius(16)
-                        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 10)
-                        .overlay {
-                            ZStack(alignment: .bottomLeading) {
+            if isLoading {
+                ProgressView()
+                    .padding(80)
 
-                                LinearGradient(
-                                    colors: [.black.opacity(0.4), .clear],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
+            } else if movies.isEmpty {
+                Text("No \(title) movies found")
+                    .foregroundColor(.gray)
 
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Top Gun")
-                                        .font(.system(size: 28, weight: .bold))
-
-                                    HStack {
-                                        ForEach(1...5, id: \.self) { _ in
-                                            Image(systemName: "star.fill")
-                                                .foregroundColor(.yellow)
-                                                .font(.system(size: 12))
-                                        }
-                                    }
-
-                                    HStack {
-                                        Text("4.8")
-                                            .font(.system(size: 20))
-                                        Text("out of 5")
-                                            .font(.system(size: 12))
-                                    }
-
-                                    Text("Action · 2 hr 9 min")
-                                        .font(.system(size: 12))
-                                }
-                                .foregroundColor(.white)
-                                .padding()
-                            }
+            } else {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 16) {
+                        ForEach(movies) { movie in
+                            MoviePosterCard(movie: movie)
                         }
-                    //2ed movie
-                    Image(.images2)
-                        .resizable()
-                        //.scaledToFit()
-                        .frame(width: 355)
-                        .aspectRatio(355 / 429, contentMode: .fill)
-                        .cornerRadius(16)
-                        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 10)
-                        .overlay {
-                            ZStack(alignment: .bottomLeading) {
-
-                                LinearGradient(
-                                    colors: [.black.opacity(0.4), .clear],
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
-
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Top Gun")
-                                        .font(.system(size: 28, weight: .bold))
-
-                                    HStack {
-                                        ForEach(1...5, id: \.self) { _ in
-                                            Image(systemName: "star.fill")
-                                                .foregroundColor(.yellow)
-                                                .font(.system(size: 12))
-                                        }
-                                    }
-
-                                    HStack {
-                                        Text("4.8")
-                                            .font(.system(size: 20))
-                                        Text("out of 5")
-                                            .font(.system(size: 12))
-                                    }
-
-                                    Text("Action · 2 hr 9 min")
-                                        .font(.system(size: 12))
-                                }
-                                .foregroundColor(.white)
-                                .padding()
-                            }
-                        }
+                    }
                 }
-                
-                
             }
         }
-        .padding(.horizontal)
-        .padding(.top, 24)
     }
 }
 
+
+struct MoviePosterCard: View {
+    let movie: MoviesInfo
+
+    var body: some View {
+        AsyncImage(url: URL(string: movie.poster)) { image in
+            image
+                .resizable()
+                .scaledToFill()
+                .overlay(
+                    LinearGradient(
+                        colors: [.black.opacity(0.9), .clear],
+                        startPoint: .bottom,
+                        endPoint: .center
+                    )
+                )
+        } placeholder: {
+            Color.gray.opacity(0.2)
+        }
+        .frame(width: 208, height: 275)
+        .clipped()
+        .cornerRadius(8)
+    }
+}
+
+struct FilteredMovieView: View {
+    let movies: [MoviesInfo]
+    let searchText: String
+
+    var filteredMovies: [MoviesInfo] {
+        movies.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+
+    var body: some View {
+        if filteredMovies.isEmpty {
+            Text("No results found")
+                .foregroundColor(.gray)
+                .padding()
+        } else {
+            LazyVStack(alignment: .leading, spacing: 16) {
+                ForEach(filteredMovies) { movie in
+                    MoviePosterCard(movie: movie)
+                }
+            }
+        }
+    }
+}
 
 
 
@@ -170,3 +182,4 @@ struct HighRatedMovies: View {
 #Preview {
     MoviesCenterView()
 }
+
