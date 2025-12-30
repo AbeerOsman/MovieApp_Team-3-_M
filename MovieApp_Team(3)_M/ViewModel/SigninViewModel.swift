@@ -6,12 +6,3 @@
 //
 
 
-//import SwiftUI
-//struct SigninViewModel : View {
-//    
-//    struct User: Codable {
-//         
-//}
-//    
-//    
-//}
