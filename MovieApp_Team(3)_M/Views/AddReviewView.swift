@@ -9,22 +9,31 @@ struct AddReviewView: View {
     @State private var Review: String = " "
     @Binding var rating: Int
     var body: some View {
-        VStack{
-            HStack(spacing: 78){
-                Button("Back", systemImage: "chevron.backward"){
+        NavigationStack {
+            
+        
+            VStack{
+                HStack(spacing: 78){
+                    Button("Back", systemImage: "chevron.backward"){
+                    }
+                    .foregroundColor(.yelloww)
+                    Text("Write a review")
+                        .font(.title2)
+                    Button("Add"){
+                        
+                    }
+                    .foregroundColor(.yelloww)
                 }
-                .foregroundColor(.yelloww)
-                Text("Write a review")
-                    .font(.title2)
-                Button("Add"){
-                    
-                }
-                .foregroundColor(.yelloww)
+                Rectangle()
+                    .frame(height: 0.3)
+                    .foregroundColor(.gray)
+                Spacer().frame(width: 38, height: 78)
+                
+                
             }
-            Rectangle()
-                .frame(height: 0.3)
-                .foregroundColor(.gray)
-            Spacer().frame(width: 38, height: 78)
+            
+            
+            
             
             VStack(alignment: .leading, spacing: 12){
                 Text("Review")

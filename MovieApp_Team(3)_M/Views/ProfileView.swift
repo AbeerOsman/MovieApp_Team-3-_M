@@ -13,17 +13,6 @@ struct ProfileView: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 10) {
-                Button(action: {
-                    dismiss()
-                }) {
-                    HStack(spacing: 3) {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .foregroundColor(.yellow)
-                    .padding(.horizontal)
-                }
-                
                 Text("Profile")
                     .font(.system(size: 38, weight: .bold))
                     .padding(.top, 21)
@@ -92,6 +81,18 @@ struct ProfileView: View {
                 .frame(maxWidth: .infinity)
                 
                 Spacer()
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: {
+                        dismiss()
+                    }) {
+                        HStack(spacing: 3) {
+                            Image(systemName: "chevron.left")
+                        }
+                        .foregroundColor(.yellow)
+                    }
+                }
             }
         }
     }

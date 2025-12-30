@@ -6,45 +6,26 @@
 //
 //
 import SwiftUI
-
 struct MoviesDetailsView: View {
     @State private var showNavTitle = false
+    
     var body: some View {
         NavigationStack {
+            
             ScrollView {
-                ZStack(alignment: .bottomLeading) {
-                    Image("images-3")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 330)
-                        .clipped()
-                    LinearGradient(
-                        colors: [
-                            .black.opacity(0.95),
-                            .black.opacity(0)
-                        ],
-                        startPoint: .bottom,
-                        endPoint: .top
-                    )
-                    Text("Movies")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
-                        .padding(.leading, 20)
-                        .padding(.bottom, 30)
-                }
-                .frame(height: 330)
-                .ignoresSafeArea(edges: .top)
-                
+                Moviesposter()
                 VStack(alignment: .leading, spacing: 26) {
+                    
                     MoviesDetails()
                     
-                    Divider().foregroundColor(.gray).opacity(0.5)
-                    
-                    story()
                     
                     Divider().foregroundColor(.gray).opacity(0.5)
                     
-                    rating()
+                    Story()
+                    
+                    Divider().foregroundColor(.gray).opacity(0.5)
+                    
+                    Rating()
                     
                     Divider().foregroundColor(.gray).opacity(0.5)
                     
@@ -56,45 +37,63 @@ struct MoviesDetailsView: View {
                     
                     Reviews()
                     
+                    
                     ReviewsScrollView()
+                    
+                    Reviewbutton()
                 }
                 .padding(.horizontal)
             }
+            
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Image(systemName: "chevron.backward")
                 }
                 
-                ToolbarItem(placement: .principal) {
-                    Text(showNavTitle ? "Movies" : "")
-                        .font(.headline)
-                        .foregroundColor(.white)
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    
+                    Image(systemName: "square.and.arrow.up")
                 }
-                
                 ToolbarItem(placement: .navigationBarTrailing) {
-                        Image(systemName: "square.and.arrow.up")
-                    }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Image(systemName: "bookmark.fill")
-                    }
+                    
+                    Image(systemName: "bookmark")                }
             }
-            .foregroundColor(.yelloww)
-    //        .toolbarBackground(.hidden, for: .navigationBar)
-       //     .toolbarColorScheme(.dark)
             
         }
+        .foregroundColor(.yelloww)
+    }
+}
+struct Moviesposter: View {
+    var body: some View {
+        ZStack(alignment: .bottomLeading) {
+            Image("images-3")
+                .resizable()
+                .scaledToFill()
+                .padding(.top,-120)
+            LinearGradient(
+                colors: [.black.opacity(0.95), .black.opacity(0)],
+                startPoint: .bottom,
+                endPoint: .top
+            )
+            
+            Text("Movies")
+                .font(.system(size: 32, weight: .bold))
+                .foregroundColor(.white)
+                .padding(.leading, 20)
+                .padding(.bottom, 30)
+        }
+        
     }
 }
 struct MoviesDetails: View {
     
-    let columns: [GridItem] = [
+    let columns = [
         GridItem(.flexible()),
         GridItem(.flexible())
     ]
     
     var body: some View {
         LazyVGrid(columns: columns, alignment: .leading, spacing: 30) {
-            
             item(title: "Duration", value: "1h 10m")
             item(title: "Language", value: "English")
             item(title: "Genre", value: "Drama")
@@ -107,7 +106,6 @@ struct MoviesDetails: View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title)
                 .font(.system(size: 18, weight: .semibold))
-            
             Text(value)
                 .font(.system(size: 15))
                 .foregroundColor(.gray)
@@ -115,8 +113,9 @@ struct MoviesDetails: View {
     }
 }
 
-struct story: View {
+struct Story: View {
     var body: some View {
+        
         VStack(alignment: .leading, spacing: 8) {
             Text("Story")
                 .font(.title2)
@@ -128,24 +127,22 @@ struct story: View {
         .foregroundColor(.white)
     }
 }
-
-
-struct rating: View {
+struct Rating: View {
     var body: some View {
-        VStack(alignment:.leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("IMDb Rating")
                 .font(.title2)
                 .bold()
+            
             Text("8.6 / 10")
                 .foregroundColor(.gray)
         }
         .foregroundColor(.white)
     }
 }
-
 struct Director: View {
     var body: some View {
-        VStack(alignment:.leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 10) {
             Text("Director")
                 .font(.title2)
                 .bold()
@@ -163,15 +160,14 @@ struct Director: View {
         .foregroundColor(.white)
     }
 }
-
 struct Stars: View {
     var body: some View {
-        VStack(alignment:.leading, spacing: 8){
+        VStack(alignment: .leading, spacing: 8) {
             Text("Stars")
                 .font(.title2)
                 .bold()
             
-            HStack(spacing: 24){
+            HStack(spacing: 24) {
                 star(name: "Actor 1")
                 star(name: "Actor 2")
                 star(name: "Actor 3")
@@ -181,7 +177,7 @@ struct Stars: View {
     }
     
     func star(name: String) -> some View {
-        VStack(spacing: 6){
+        VStack(spacing: 6) {
             Image("images-2")
                 .resizable()
                 .scaledToFill()
@@ -194,20 +190,19 @@ struct Stars: View {
         }
     }
 }
-
 struct Reviews: View {
     var body: some View {
-        VStack(alignment:.leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("Rating & Reviews")
                 .font(.title2)
                 .bold()
+            
             Text("4.8 out of 5")
                 .foregroundColor(.gray)
         }
         .foregroundColor(.white)
     }
 }
-
 struct ReviewCard: View {
     @State private var rating = 4
     
@@ -231,7 +226,7 @@ struct ReviewCard: View {
             Text("This is an engagingly simple, good-hearted film...")
                 .foregroundColor(.white.opacity(0.9))
             
-            HStack{
+            HStack {
                 Spacer()
                 Text("Tuesday")
                     .foregroundColor(.gray)
@@ -243,9 +238,6 @@ struct ReviewCard: View {
         .cornerRadius(18)
     }
 }
-
-
-// ******** REVIEWS HORIZONTAL ********
 struct ReviewsScrollView: View {
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -259,8 +251,30 @@ struct ReviewsScrollView: View {
         }
     }
 }
-
-
+struct Reviewbutton: View {
+    var body: some View {
+        Button(action: {
+            print("Write a review")})
+        {
+            HStack {
+                Image(systemName: "square.and.pencil")
+                    .font(.title2)
+                Text("Write a review")
+                    .font(.title2)
+                
+                
+            }
+            .foregroundColor(.yelloww)
+            .padding(.vertical, 14)
+            .padding(.horizontal, 18)
+            .frame(maxWidth: .infinity)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(Color.yelloww, lineWidth: 2)
+            )
+        }.padding(.horizontal)
+    }
+}
 #Preview {
     MoviesDetailsView()
 }
