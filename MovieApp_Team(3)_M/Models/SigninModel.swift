@@ -1,5 +1,5 @@
 //
-//  Untitled.swift
+//  UserInfo.swift
 //  MovieApp_Team(3)_M
 //
 //  Created by Shaikha Alnashri on 09/07/1447 AH.
@@ -12,14 +12,44 @@ struct UsersResponse: Codable {
 }
 
 struct UserRecord: Codable, Identifiable {
-        let id: String
-        let fields: UserInfo
+    let id: String
+    let fields: UserInfo
 }
 
 struct UserInfo: Codable {
-        let name: String
-        let password: String
-        let email:  String
-        let profile_image: String
-    
+    let name: String
+    let password: String
+    let email: String
+    let profile_image: String
 }
+
+enum SigninError: Error {
+    case invalidURL
+    case invalidResponse
+    case invalidEmail
+    case invalidPassword
+    case userNotFound
+    case networkError
+    case unknownError
+    
+    var errorMessage: String {
+        switch self {
+        case .invalidURL:
+            return "Invalid URL"
+        case .invalidResponse:
+            return "Invalid server response"
+        case .invalidEmail:
+            return "Please enter a valid email address"
+        case .invalidPassword:
+            return "Invalid password. Please try again"
+        case .userNotFound:
+            return "No account found with this email"
+        case .networkError:
+            return "Network error. Please check your connection"
+        case .unknownError:
+            return "Something went wrong. Please try again"
+        }
+    }
+}
+
+

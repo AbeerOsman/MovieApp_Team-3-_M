@@ -11,7 +11,7 @@ import SwiftUI
 struct MovieApp_Team_3__MApp: App {
     var body: some Scene {
         WindowGroup {
-            MoviesCenterView()
+            SigninView()
                 .preferredColorScheme(.dark)
         }
     }

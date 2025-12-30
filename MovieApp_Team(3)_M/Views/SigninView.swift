@@ -7,7 +7,7 @@
 import SwiftUI
 
 struct SigninView: View {
-    //@StateObject private var viewModel = SigninViewModel()
+    @StateObject private var viewModel = SigninViewModel()
     
     var body: some View {
         NavigationStack {
@@ -42,7 +42,7 @@ struct SigninView: View {
                             .font(.system(size: 18, weight: .medium))
                             .foregroundColor(.white)
                         
-                    //    TextField("Enter your email", text: $viewModel.email)
+                        TextField("Enter your email", text: $viewModel.email)
                             .padding()
                             .background(Color(red: 0.2, green: 0.2, blue: 0.2).opacity(0.9))
                             .cornerRadius(8)
@@ -111,7 +111,7 @@ struct SigninView: View {
                 .padding()
                 .foregroundColor(.white)
             }
-           // .navigationDestination(isPresented: $viewModel.isSignedIn) {
+            .navigationDestination(isPresented: $viewModel.isSignedIn) {
                 MoviesCenterView()
             }
         }
