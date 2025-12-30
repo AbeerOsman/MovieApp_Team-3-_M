@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  MovieApp_Team(3)_M
-//
-//  Created by Abeer Jeilani Osman  on 03/07/1447 AH.
-//  Check the push 
-
 import SwiftUI
 
 struct MoviesCenterView: View {
@@ -24,17 +17,7 @@ struct MoviesCenterView: View {
                     VStack(spacing: 24) {
                         HighRatedMovies()
 
-                        MoviesCategoryView(
-                            title: "Drama",
-                            movies: viewModel.moviesByGenre("Drama"),
-                            isLoading: viewModel.isLoading
-                        )
-
-                        MoviesCategoryView(
-                            title: "Comedy",
-                            movies: viewModel.moviesByGenre("Comedy"),
-                            isLoading: viewModel.isLoading
-                        )
+                        MoviesCategoryListView()
                     }
                 }
                 
@@ -49,7 +32,6 @@ struct MoviesCenterView: View {
         }
     }
 }
-
 struct HeaderView: View {
     @Binding var searchText: String
     var body: some View {
@@ -62,12 +44,12 @@ struct HeaderView: View {
                         .navigationBarBackButtonHidden(true)){
                         Circle()
                             .fill(Color.gray.opacity(0.2))
-                            .frame(width: 41, height: 41)
+                            .frame(width: 50, height: 50)
                             .overlay(
                                 Image(.profileAvatar)
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 28, height: 28)
+                                    .frame(width: 40, height: 40)
                             )
                     }
                 }
@@ -77,7 +59,7 @@ struct HeaderView: View {
                         .foregroundColor(.gray)
                     TextField("Search for movie name, actors ...", text: $searchText)
                 }
-                .padding(12)
+                .padding(8)
                 .background(Color(.systemGray6))
                 .cornerRadius(12)
             }.background(
@@ -91,30 +73,48 @@ struct HeaderView: View {
     }
 }
 
+struct MoviesCategoryListView: View {
+    @StateObject private var viewModel = MoviesViewModel()
 
+    var body: some View {
+        VStack {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .padding(100)
+                    } else {
+                        VStack(spacing: 24) {
+                            ForEach(viewModel.uniqueGenres, id: \.self) { genre in
+                                MovieCategorySection(
+                                    category: genre,
+                                    movies: viewModel.moviesByGenre(genre)
+                                )
+                            }
+                        }
+                        .padding(.top, 24)
+                    }
+                }
+                .task {
+                    await viewModel.loadMovies()
+                }
+    }
+}
 
-struct MoviesCategoryView: View {
-    let title: String
+struct MovieCategorySection: View {
+    let category: String
     let movies: [MoviesInfo]
-    let isLoading: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-
-            Text(title)
+            Text(category)
                 .font(.system(size: 22, weight: .semibold))
-
-            if isLoading {
-                ProgressView()
-                    .padding(80)
-
-            } else if movies.isEmpty {
-                Text("No \(title) movies found")
+            
+            if movies.isEmpty {
+                Text("No \(category.lowercased()) movies found")
                     .foregroundColor(.gray)
-
+                    .padding()
             } else {
                 ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 16) {
+                    HStack(spacing: 12) {
                         ForEach(movies) { movie in
                             MoviePosterCard(movie: movie)
                         }
@@ -125,28 +125,29 @@ struct MoviesCategoryView: View {
     }
 }
 
-
 struct MoviePosterCard: View {
     let movie: MoviesInfo
 
     var body: some View {
-        AsyncImage(url: URL(string: movie.poster)) { image in
-            image
-                .resizable()
-                .scaledToFill()
-                .overlay(
-                    LinearGradient(
-                        colors: [.black.opacity(0.9), .clear],
-                        startPoint: .bottom,
-                        endPoint: .center
+        VStack(alignment: .leading) {
+            AsyncImage(url: URL(string: movie.poster)) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .overlay(
+                        LinearGradient(
+                            colors: [.black.opacity(0.9), .clear],
+                            startPoint: .bottom,
+                            endPoint: .center
+                        )
                     )
-                )
-        } placeholder: {
-            Color.gray.opacity(0.2)
+            } placeholder: {
+                Color.gray.opacity(0.2)
+            }
+            .frame(width: 208, height: 275)
+            .clipped()
+            .cornerRadius(8)
         }
-        .frame(width: 208, height: 275)
-        .clipped()
-        .cornerRadius(8)
     }
 }
 
@@ -175,11 +176,6 @@ struct FilteredMovieView: View {
     }
 }
 
-
-
-
-
 #Preview {
     MoviesCenterView()
 }
-

@@ -17,7 +17,11 @@ class MoviesViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     
-
+    var uniqueGenres: [String] {
+           let allGenres = movies.flatMap { $0.genre }
+           return Array(Set(allGenres)).sorted() // Remove duplicates and sort alphabetically
+       }
+    
     /// Get movies filtered by genre / category
     func moviesByGenre(_ genre: String) -> [MoviesInfo] {
         movies.filter { $0.genre.contains(genre) }

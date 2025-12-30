@@ -76,7 +76,7 @@ struct ProfileView: View {
                         .padding(.horizontal)
                 }
                 VStack (spacing: 5){
-                        Image("movieisme")
+                    Image(.movieismeLogo)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 94, height: 94)
