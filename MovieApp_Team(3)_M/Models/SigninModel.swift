@@ -12,11 +12,16 @@ struct UsersResponse: Codable {
 }
 
 struct UserRecord: Codable, Identifiable {
+<<<<<<< HEAD
     let id: String
+=======
+    let id: String                 // ✅ Airtable user record ID
+>>>>>>> main
     let fields: UserInfo
 }
 
 struct UserInfo: Codable {
+<<<<<<< HEAD
     let name: String?
     let password: String
     let email: String
@@ -49,7 +54,27 @@ enum SigninError: Error {
         case .unknownError:
             return "Something went wrong. Please try again"
         }
+=======
+    let name: String
+    let password: String
+    let email: String
+    let profileImage: String
+
+    enum CodingKeys: String, CodingKey {
+        case name, password, email
+        case profileImage = "profile_image"
+>>>>>>> main
     }
 }
 
 
+<<<<<<< HEAD
+=======
+// Error handling
+enum UsersError: Error {
+    case invalidURL
+    case invalidResponse
+    case invalidData
+}
+
+>>>>>>> main
