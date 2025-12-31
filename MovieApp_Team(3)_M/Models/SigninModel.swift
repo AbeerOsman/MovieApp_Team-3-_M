@@ -17,10 +17,10 @@ struct UserRecord: Codable, Identifiable {
 }
 
 struct UserInfo: Codable {
-    let name: String
+    let name: String?
     let password: String
     let email: String
-    let profile_image: String
+    let profile_image: String?
 }
 
 enum SigninError: Error {

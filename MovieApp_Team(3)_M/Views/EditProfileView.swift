@@ -15,34 +15,6 @@ struct EditProfileView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
-            ZStack {
-                Text("Profile info")
-                    .font(.system(size: 20, weight: .bold))
-                
-                HStack {
-                    Button(action: {
-                        dismiss()
-                    }) {
-                        HStack(spacing: 3) {
-                            Image(systemName: "chevron.left")
-                            Text("Back")
-                        }
-                        .foregroundColor(.yellow)
-                    }
-                    
-                    Spacer()
-                    
-                    Button(action: {}) {
-                        Text("Edit")
-                            .foregroundColor(.yellow)
-                            .font(.system(size: 16, weight: .medium))
-                    }
-                }
-            }
-            .padding(.horizontal)
-            
-            Divider()
-            
             VStack(spacing: 20) {
                 ZStack {
                     Circle()
@@ -107,11 +79,35 @@ struct EditProfileView: View {
             
             Spacer()
         }
+        .navigationTitle("Profile info")
+        .navigationBarTitleDisplayMode(.inline)
         .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    dismiss()
+                }) {
+                    HStack(spacing: 3) {
+                        Image(systemName: "chevron.left")
+                    }
+                    .foregroundColor(.yellow)
+                }
+            }
+            
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {}) {
+                    Text("Edit")
+                        .foregroundColor(.yellow)
+                        .font(.system(size: 16, weight: .medium))
+                }
+            }
+        }
     }
 }
 
 #Preview {
-    EditProfileView()
-        .preferredColorScheme(.dark)
+    NavigationStack {
+        EditProfileView()
+            .preferredColorScheme(.dark)
+    }
 }
