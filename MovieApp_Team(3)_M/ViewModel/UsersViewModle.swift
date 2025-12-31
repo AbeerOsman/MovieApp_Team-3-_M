@@ -6,53 +6,56 @@
 //
 
 import Foundation
-<<<<<<< HEAD
-
-=======
 import Combine
 
 @MainActor
 class UsesViewModel: ObservableObject {
-
     @Published var user: UserInfo?
     @Published var userRecord: UserRecord?
     @Published var isLoading = false
     @Published var errorMessage: String?
-
+    
     func fetchUser() async {
+        // Get the Airtable record ID from SessionManager
+        guard let recordId = SessionManager.shared.userRecordId else {
+            errorMessage = "No user logged in"
+            return
+        }
+        
         isLoading = true
         errorMessage = nil
-
+        
         do {
-            let endpoint = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users/recPMaNVKM6yYZFIl"
-
+            let endpoint = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users/\(recordId)"
+            
             guard let url = URL(string: endpoint) else {
-                throw UsersError.invalidURL
+                throw SigninError.invalidURL
             }
-
+            
             var request = URLRequest(url: url)
             request.setValue(
                 "Bearer \(APIKey.airtable)",
                 forHTTPHeaderField: "Authorization"
             )
-
+            
             let (data, response) = try await URLSession.shared.data(for: request)
-
+            
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200 else {
-                throw UsersError.invalidResponse
+                throw SigninError.invalidResponse
             }
-
+            
             let decoder = JSONDecoder()
             let result = try decoder.decode(UserRecord.self, from: data)
-
+            
             self.userRecord = result
-
+            self.user = result.fields
+            
         } catch {
             errorMessage = error.localizedDescription
+            print("Fetch user error:", error)
         }
-
+        
         isLoading = false
     }
 }
->>>>>>> main

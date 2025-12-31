@@ -12,6 +12,7 @@ struct EditProfileView: View {
     @State private var firstName: String = "Sarah"
     @State private var lastName: String = "Abdullah"
     @State private var showSignOutAlert = false
+    @StateObject private var sessionViewModel = SessionManager()
     
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
@@ -64,7 +65,7 @@ struct EditProfileView: View {
                 .padding(.horizontal)
                 .padding(.top, 20)
 
-                Button(action: {}) {
+                Button(action: {sessionViewModel.signOut()}) {
                     Text("Sign Out")
                         .font(.system(size: 18, weight: .semibold))
                         .foregroundColor(.red)

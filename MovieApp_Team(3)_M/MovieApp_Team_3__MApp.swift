@@ -8,11 +8,20 @@
 import SwiftUI
 
 @main
-struct MovieApp_Team_3__MApp: App {
+struct MovieApp: App {
+    @StateObject var sessionManager = SessionManager.shared
+    
     var body: some Scene {
         WindowGroup {
-            SigninView()
-                .preferredColorScheme(.dark)
+            if sessionManager.isLoggedIn {
+                MoviesCenterView()
+                    .environmentObject(sessionManager)
+                    .preferredColorScheme(.dark)
+            } else {
+                SigninView()
+                    .environmentObject(sessionManager)
+                    .preferredColorScheme(.dark)
+            }
         }
     }
 }
