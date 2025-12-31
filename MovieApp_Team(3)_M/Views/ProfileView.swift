@@ -1,4 +1,4 @@
-//
+// updated by Abeer
 //  ProfileView.swift
 //  MovieApp_Team(3)_M
 //
@@ -8,11 +8,31 @@
 import SwiftUI
 
 struct ProfileView: View {
+    
     @Environment(\.dismiss) var dismiss
+    @StateObject private var UserviewModel = UsesViewModel()
+    @StateObject var moviesViewModle = MoviesViewModel()
+    @StateObject private var savedMoviesViewModle = SavedMoviesViewModle()
+    
+    var currentUserSavedMovies: [MoviesInfo] {
+        guard let user = UserviewModel.userRecord else { return [] }
+
+        // 1. Get saved movie IDs for this user
+        let savedMovieIds = savedMoviesViewModle.savedMovies
+            .filter { $0.userId == user.id }
+            .flatMap { $0.movieId }
+
+        // 2. Match them with movies list
+        return moviesViewModle.movies.filter { savedMovieIds.contains($0.id) }
+    }
+    
+    
     
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 10) {
+                
+                // Title
                 Text("Profile")
                     .font(.system(size: 38, weight: .bold))
                     .padding(.top, 21)
@@ -20,28 +40,38 @@ struct ProfileView: View {
                 
                 Divider()
                 
+                // Profile Card
                 NavigationLink(destination: EditProfileView()) {
                     HStack(spacing: 16) {
+                        // Avatar
                         ZStack {
-                            Circle()
-                                .fill(Color.gray.opacity(0.2))
-                                .frame(width: 60, height: 60)
-                            
-                            Image(.profileAvatar)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 50, height: 50)
-                                .foregroundColor(.brown)
+                            if let user = UserviewModel.user{
+                                Circle()
+                                    .fill(Color.gray.opacity(0.2))
+                                    .frame(width: 60, height: 60)
+                                
+                                Image(user.profileImage)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 50, height: 50)
+                            }
                         }
                         
+                        // User Info
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("Sarah Abdullah")
-                                .font(.system(size: 20, weight: .semibold))
-                                .foregroundColor(.white)
-                            
-                            Text("Xxxx234@gmail.com")
-                                .font(.system(size: 15))
-                                .foregroundColor(.white)
+                            if let user = UserviewModel.user {
+                                Text(user.name)
+                                    .font(.system(size: 20, weight: .semibold))
+                                    .foregroundColor(.white)
+                                
+                                Text(user.email)
+                                    .font(.system(size: 15))
+                                    .foregroundColor(.white)
+                            } else {
+                                Text("Loading...")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.gray)
+                            }
                         }
                         
                         Spacer()
@@ -58,42 +88,86 @@ struct ProfileView: View {
                 .padding(.horizontal, 10)
                 .padding(.top, 30)
                 
-                VStack {
-                    Text("Saved Movies")
-                        .font(.system(size: 26, weight: .bold))
-                        .padding(.top, 40)
+                // Saved Movies Title
+                Text("Saved Movies")
+                    .font(.system(size: 26, weight: .bold))
+                    .padding(.top, 40)
+                    .padding(.horizontal)
+
+                // Saved Movies List
+                if !currentUserSavedMovies.isEmpty {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 15) {
+                            ForEach(currentUserSavedMovies) { movie in
+                                SavedMoviePosterCard(movie: movie)
+                            }
+                        }
                         .padding(.horizontal)
-                }
-                VStack (spacing: 5){
-                    Image(.movieismeLogo)
+                    }
+                } else {
+                    // Empty State
+                    VStack(spacing: 5) {
+                        Image(.movieismeLogo)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 94, height: 94)
                             .padding(.top, 95)
-
                         
-                        Text("No saved movies yet,start save\n your favourites")
+                        Text("No saved movies yet, start save\nyour favourites")
                             .font(.system(size: 17))
                             .foregroundColor(.gray)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                     }
-                .frame(maxWidth: .infinity)
+                    .frame(maxWidth: .infinity)
+                }
                 
                 Spacer()
             }
+            .onAppear {
+                Task {
+                    await UserviewModel.fetchUser()
+                    await moviesViewModle.loadMovies()
+                    await savedMoviesViewModle.loadSavedMovies()
+                }
+            }
+            // Back Button
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button(action: {
+                    Button {
                         dismiss()
-                    }) {
-                        HStack(spacing: 3) {
-                            Image(systemName: "chevron.left")
-                        }
-                        .foregroundColor(.yellow)
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(.yellow)
                     }
                 }
             }
+        }
+    }
+}
+
+struct SavedMoviePosterCard: View {
+    let movie: MoviesInfo
+
+    var body: some View {
+        VStack(alignment: .leading) {
+            AsyncImage(url: URL(string: movie.poster)) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .overlay(
+                        LinearGradient(
+                            colors: [.black.opacity(0.9), .clear],
+                            startPoint: .bottom,
+                            endPoint: .center
+                        )
+                    )
+            } placeholder: {
+                Color.gray.opacity(0.2)
+            }
+            .frame(width: 208, height: 275)
+            .clipped()
+            .cornerRadius(8)
         }
     }
 }
