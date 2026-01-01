@@ -4,6 +4,7 @@ struct MoviesCenterView: View {
     @State private var searchText = ""
     @StateObject private var viewModel = MoviesViewModel()
     
+    
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
@@ -34,26 +35,31 @@ struct MoviesCenterView: View {
 }
 struct HeaderView: View {
     @Binding var searchText: String
+    @EnvironmentObject var sessionManager: SessionManager
+    
     var body: some View {
             VStack(spacing: 16) {
-                HStack {
-                    Text("Movies Center")
-                        .font(.system(size: 28, weight: .bold))
-                    Spacer()
-                    NavigationLink(destination: ProfileView()
-                        .navigationBarBackButtonHidden(true)){
-                        Circle()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(width: 50, height: 50)
-                            .overlay(
-                                Image(.profileAvatar)
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 40, height: 40)
-                            )
+                
+                    HStack {
+                        Text("Movies Center")
+                            .font(.system(size: 28, weight: .bold))
+                        Spacer()
+                        if let user = sessionManager.currentUser {
+                            NavigationLink(destination: ProfileView()
+                                .navigationBarBackButtonHidden(true)){
+                                    Circle()
+                                        .fill(Color.gray.opacity(0.2))
+                                        .frame(width: 50, height: 50)
+                                        .overlay(
+                                            Image(user.profileImage ?? "User Avatare")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 40, height: 40)
+                                        )
+                                }
+                        }
                     }
-                }
-
+                
                 HStack {
                     Image(systemName: "magnifyingglass")
                         .foregroundColor(.gray)

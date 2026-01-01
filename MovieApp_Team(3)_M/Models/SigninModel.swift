@@ -18,10 +18,16 @@ struct UserRecord: Codable, Identifiable {
 
 struct UserInfo: Codable {
     let name: String?
-    let password: String
-    let email: String
-    let profile_image: String?
+    let password: String?
+    let email: String?
+    let profileImage: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case name, password, email
+        case profileImage = "profile_image"
+    }
 }
+
 
 enum SigninError: Error {
     case invalidURL
@@ -49,6 +55,7 @@ enum SigninError: Error {
         case .unknownError:
             return "Something went wrong. Please try again"
         }
+<<<<<<< HEAD
         let name: String
         let password: String
         let email: String
@@ -67,4 +74,9 @@ enum SigninError: Error {
         case invalidData
     }
     
+=======
+    
+    }
+    
+>>>>>>> main
 }

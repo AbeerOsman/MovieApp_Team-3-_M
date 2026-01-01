@@ -20,13 +20,13 @@ class SavedMoviesViewModle: ObservableObject {
         
         do {
             savedMovies = try await getSavedMovies()
-            print("✅ Loaded saved movies: \(savedMovies.count) records")
+            print("Loaded saved movies: \(savedMovies.count) records")
             for movie in savedMovies {
                 print("  User: \(movie.userId), Movie IDs: \(movie.movieId)")
             }
         } catch {
             errorMessage = error.localizedDescription
-            print("❌ Error loading saved movies:", error)
+            print("Error loading saved movies:", error)
         }
     }
     

@@ -1,23 +1,33 @@
+<<<<<<< HEAD
 
 //
 //  SignInView.swift
 //  MovieApp_Team(3)_M
 
+=======
+//
+//  SignInView.swift
+//  MovieApp_Team(3)_M
+>>>>>>> main
 ////  SignInView.swift
 ////  MovieApp_Team(3)_M
 ////
 ////  Created by Shaikha Alnashri on 04/07/1447 AH.
+<<<<<<< HEAD
 ////
 
 //
 //import SwiftUI
 //
+=======
+>>>>>>> main
 
 
 import SwiftUI
 
 struct SigninView: View {
     @StateObject private var viewModel = SigninViewModel()
+    @StateObject private var sessionViewModel = SessionManager()
     
     var body: some View {
         
@@ -132,7 +142,7 @@ struct SigninView: View {
                 .padding()
                 .foregroundColor(.white)
             }
-            .navigationDestination(isPresented: $viewModel.isSignedIn) {
+             .navigationDestination(isPresented: $sessionViewModel.isLoggedIn) {
                 MoviesCenterView()
             }
         }
@@ -143,7 +153,10 @@ struct SigninView: View {
     SigninView()
         .preferredColorScheme(.dark)
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
 //struct SigninView: View {
 //    //@StateObject private var viewModel = SigninViewModel()
 //    
@@ -260,4 +273,7 @@ struct SigninView: View {
 //    SigninView()
 //    .preferredColorScheme(.dark)
 //}
+<<<<<<< HEAD
 
+=======
+>>>>>>> main
