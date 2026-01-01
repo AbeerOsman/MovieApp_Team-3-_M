@@ -105,6 +105,7 @@ class SigninViewModel: ObservableObject {
     }
 
     private func saveSession(for user: UserInfo) {
+        
         UserDefaults.standard.set(true, forKey: "isLoggedIn")
         UserDefaults.standard.set(user.email, forKey: "userEmail")
         UserDefaults.standard.set(user.name ?? "User", forKey: "userName")

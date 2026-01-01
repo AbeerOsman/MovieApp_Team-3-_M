@@ -1,18 +1,18 @@
-<<<<<<< HEAD
+
 //
 //  SignInView.swift
 //  MovieApp_Team(3)_M
-=======
+
 ////  SignInView.swift
 ////  MovieApp_Team(3)_M
 ////
 ////  Created by Shaikha Alnashri on 04/07/1447 AH.
 ////
->>>>>>> main
+
 //
 //import SwiftUI
 //
-<<<<<<< HEAD
+
 
 import SwiftUI
 
@@ -143,7 +143,7 @@ struct SigninView: View {
     SigninView()
         .preferredColorScheme(.dark)
 }
-=======
+
 //struct SigninView: View {
 //    //@StateObject private var viewModel = SigninViewModel()
 //    
@@ -260,4 +260,4 @@ struct SigninView: View {
 //    SigninView()
 //    .preferredColorScheme(.dark)
 //}
->>>>>>> main
+
