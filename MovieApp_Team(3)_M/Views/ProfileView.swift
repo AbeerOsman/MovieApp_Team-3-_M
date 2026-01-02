@@ -1,10 +1,3 @@
-// updated by Abeer
-//  ProfileView.swift
-//  MovieApp_Team(3)_M
-//
-//  Created by Shaikha Alnashri on 04/07/1447 AH.
-//
-
 import SwiftUI
 
 struct ProfileView: View {
@@ -13,15 +6,28 @@ struct ProfileView: View {
     @StateObject var moviesViewModel = MoviesViewModel()
     @StateObject private var savedMoviesViewModel = SavedMoviesViewModle()
     @EnvironmentObject var sessionManager: SessionManager
+    @State private var isLoading = true
     
-    var currentUserSavedMovies: [MoviesInfo] {
-        guard let recordId = sessionManager.userRecordId else { return [] }
+    var currentUserSavedMovies: [MovieRecord] {
+        guard let recordId = sessionManager.userRecordId else {
+            print("DEBUG: No user record ID")
+            return []
+        }
+        
+        print("DEBUG: Current user record ID: \(recordId)")
+        print("DEBUG: All saved movies count: \(savedMoviesViewModel.savedMovies.count)")
         
         let savedMovieIds = savedMoviesViewModel.savedMovies
             .filter { $0.userId == recordId }
             .flatMap { $0.movieId }
         
-        return moviesViewModel.movies.filter { savedMovieIds.contains($0.id) }
+        print("DEBUG: Filtered movie IDs for user: \(savedMovieIds)")
+        print("DEBUG: Total movies in ViewModel: \(moviesViewModel.moviesRecored.count)")
+        
+        let filtered = moviesViewModel.moviesRecored.filter { savedMovieIds.contains($0.id) }
+        print("DEBUG: Filtered movies found: \(filtered.count)")
+        
+        return filtered
     }
     
     var body: some View {
@@ -84,12 +90,14 @@ struct ProfileView: View {
                         .padding(.horizontal)
                     
                     // Saved Movies List
-                    if !currentUserSavedMovies.isEmpty {
+                    if isLoading {
+                        ProgressView()
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    } else if !currentUserSavedMovies.isEmpty {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 15) {
-                                ForEach(currentUserSavedMovies) { movie in
-                                    SavedMoviePosterCard(movieId: movie.id,
-                                            movies: moviesViewModel.movies)
+                                ForEach(currentUserSavedMovies) { movieRecord in
+                                    SavedMoviePosterCard(movie: movieRecord.fields)
                                 }
                             }
                             .padding(.horizontal)
@@ -116,9 +124,18 @@ struct ProfileView: View {
             }
             .onAppear {
                 Task {
-                    await userViewModel.fetchUser()
-                    await savedMoviesViewModel.loadSavedMovies()
-                    await moviesViewModel.loadMovies()
+                    print("DEBUG: Starting to load data...")
+                    isLoading = true
+                    
+                    // Load all data concurrently
+                    async let userTask = userViewModel.fetchUser()
+                    async let savedMoviesTask = savedMoviesViewModel.loadSavedMovies()
+                    async let moviesTask = moviesViewModel.loadMovies()
+                    
+                    _ = await (userTask, savedMoviesTask, moviesTask)
+                    
+                    print("DEBUG: All data loaded")
+                    isLoading = false
                 }
             }
             .toolbar {
@@ -134,16 +151,11 @@ struct ProfileView: View {
 }
 
 struct SavedMoviePosterCard: View {
-    let movieId: String
-        let movies: [MoviesInfo]
-
-        var movie: MoviesInfo? {
-            movies.first { $0.id == movieId }
-        }
+    let movie: MoviesInfo
 
     var body: some View {
         VStack(alignment: .leading) {
-            AsyncImage(url: URL(string: movie?.poster ?? "")) { image in
+            AsyncImage(url: URL(string: movie.poster)) { image in
                 image
                     .resizable()
                     .scaledToFill()
@@ -166,5 +178,6 @@ struct SavedMoviePosterCard: View {
 
 #Preview {
     ProfileView()
+        .environmentObject(SessionManager())
         .preferredColorScheme(.dark)
 }

@@ -5,6 +5,7 @@ struct MoviesCenterView: View {
     @StateObject private var viewModel = MoviesViewModel()
     
     
+    
     var body: some View {
         NavigationStack {
             ScrollView(.vertical, showsIndicators: false) {
