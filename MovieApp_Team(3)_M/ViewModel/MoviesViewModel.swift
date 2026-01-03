@@ -58,6 +58,7 @@ class MoviesViewModel: ObservableObject {
         )
         // Call network
         let (data, response) = try await URLSession.shared.data(for: request)
+      //  print(String(data: data, encoding: .utf8),"⌚️")
         // Check HTTP response
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {

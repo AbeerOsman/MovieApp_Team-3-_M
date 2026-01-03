@@ -13,17 +13,22 @@ class MovieDetailsViewModel: ObservableObject {
     @Published var moviee: MovieFields?
     @Published var actorss: [ActorFilds] = []
     @Published var director: DirectorFields?
+    @Published var reviews: [ReviewUIModel] = []
+    @Published var allUsers: [UserRecord] = []
     
     func load_movie(movieID: String) async {
         await fetch_movie(movieID: movieID)
         await fetch_actors(movieID: movieID)
         await fetch_director(movieID: movieID)
+        await fetchAllUsers()
+        await fetchReviews(movieID: movieID)
     }
     
     private func fetch_movie(movieID: String) async {
         do {
             let endpoint = NetworkService.movieEndpoint(for: movieID)
             let data = try await NetworkService.fetch(endpoint)
+            //       print(String(data: data, encoding: .utf8),"‼️")
             let response = try JSONDecoder().decode(MovieResponse.self, from: data)
             self.moviee = response.fields
         } catch {
@@ -74,4 +79,52 @@ class MovieDetailsViewModel: ObservableObject {
             print("Director fetch error:", error)
         }
     }
+    private func fetchAllUsers() async {
+        do {
+            let data = try await NetworkService.fetch(NetworkService.userEndpoint())
+            let response = try JSONDecoder().decode(UsersResponse.self, from: data)
+            self.allUsers = response.records
+        } catch {
+            print("Fetch all users error:", error)
+        }
+    }
+    
+    //  Fetch reviews
+    private func fetchReviews(movieID: String) async {
+        do {
+            let data = try await NetworkService.fetch(NetworkService.reviewEndpoint(for: movieID))
+            let response = try JSONDecoder().decode(ReviewResponse.self, from: data)
+            
+            var uiReviews: [ReviewUIModel] = []
+            
+            for record in response.records {
+                if let userRecord = allUsers.first(where: { $0.id == record.fields.user_id }) {
+                    let reviewUI = ReviewUIModel(
+                        id: record.id,
+                        userName: userRecord.fields.name ?? "Unknown",
+                        userImage: userRecord.fields.profileImage ?? "",
+                        rating: record.fields.rate,
+                        text: record.fields.review_text
+                    )
+                    uiReviews.append(reviewUI)
+                } else {
+                    // fallback if user not found
+                    let reviewUI = ReviewUIModel(
+                        id: record.id,
+                        userName: "Unknown",
+                        userImage: "",
+                        rating: record.fields.rate,
+                        text: record.fields.review_text
+                    )
+                    uiReviews.append(reviewUI)
+                }
+            }
+            
+            self.reviews = uiReviews
+            
+        } catch {
+            print("Review fetch error:", error)
+        }
+    }
 }
+  
