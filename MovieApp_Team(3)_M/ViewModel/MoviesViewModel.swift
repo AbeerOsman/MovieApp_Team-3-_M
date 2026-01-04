@@ -5,7 +5,6 @@
 //  Created by Abeer Jeilani Osman  on 06/07/1447 AH.
 //
 
-
 import Foundation
 import Combine
 
@@ -13,6 +12,7 @@ import Combine
 class MoviesViewModel: ObservableObject {
 
     @Published var movies: [MoviesInfo] = []
+    @Published var moviesRecored: [MovieRecord] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     
@@ -34,7 +34,10 @@ class MoviesViewModel: ObservableObject {
         defer { isLoading = false }
 
         do {
-            movies = try await getMovies()
+            let fullRecords = try await getMoviesRecords()
+            moviesRecored = fullRecords
+            movies = fullRecords.map { $0.fields }
+            print("DEBUG: Loaded \(moviesRecored.count) movie records")
         } catch {
             errorMessage = error.localizedDescription
             print("Error loading movies:", error)
@@ -42,7 +45,7 @@ class MoviesViewModel: ObservableObject {
     }
 
     // Networking
-    private func getMovies() async throws -> [MoviesInfo] {
+    private func getMoviesRecords() async throws -> [MovieRecord] {
         let endpoint = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/movies"
         // Convert string url into URL object
         guard let url = URL(string: endpoint) else {
@@ -58,6 +61,7 @@ class MoviesViewModel: ObservableObject {
         )
         // Call network
         let (data, response) = try await URLSession.shared.data(for: request)
+      //  print(String(data: data, encoding: .utf8),"⌚️")
         // Check HTTP response
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {
@@ -66,7 +70,7 @@ class MoviesViewModel: ObservableObject {
         // Decode JSON
         let decoder = JSONDecoder()
         let result = try decoder.decode(MoviesResponse.self, from: data)
-        // Return array of MoviesInfo
-        return result.records.map { $0.fields }
+        // Return array of MovieRecord
+        return result.records
     }
 }
