@@ -21,8 +21,13 @@ struct MovieFields: Codable {
     let runtime: String
     let genre: [String]
     let rating: String
-    let IMDb_rating: Double
+    let IMDbRating: Double
     let language: [String]
+    
+    enum CodingKeys: String, CodingKey {
+        case name,poster,story, runtime, genre, rating,language
+        case IMDbRating = "IMDb_rating"
+    }
 }
 
 // Mapping of movies to actor IDs

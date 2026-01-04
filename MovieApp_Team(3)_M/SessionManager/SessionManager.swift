@@ -9,6 +9,7 @@ import Combine
 
 @MainActor
 class SessionManager: ObservableObject {
+    //Only one session manager exists +  Used everywhere in the app
     static let shared = SessionManager()
     
     @Published var currentUser: UserInfo?

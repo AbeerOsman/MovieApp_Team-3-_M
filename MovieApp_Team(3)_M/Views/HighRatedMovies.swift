@@ -26,7 +26,7 @@ struct HighRatedMovies: View {
                 MoviesScrollView(movies: highRatedMovies)
             }
         }
-        .padding(.top, 24)
+        .padding(.top, 8)
         .task {
             await viewModel.loadMovies()
         }
@@ -186,7 +186,6 @@ struct EmptyStateView: View {
 
 struct SectionTitle: View {
     let title: String
-
     var body: some View {
         Text(title)
             .font(.system(size: 22, weight: .semibold))

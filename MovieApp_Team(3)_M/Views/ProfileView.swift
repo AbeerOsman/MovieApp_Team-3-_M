@@ -13,19 +13,13 @@ struct ProfileView: View {
             print("DEBUG: No user record ID")
             return []
         }
-        
-        print("DEBUG: Current user record ID: \(recordId)")
-        print("DEBUG: All saved movies count: \(savedMoviesViewModel.savedMovies.count)")
-        
+        //Check saved movies for this current user of App
         let savedMovieIds = savedMoviesViewModel.savedMovies
             .filter { $0.userId == recordId }
             .flatMap { $0.movieId }
-        
-        print("DEBUG: Filtered movie IDs for user: \(savedMovieIds)")
-        print("DEBUG: Total movies in ViewModel: \(moviesViewModel.moviesRecored.count)")
-        
+       
+        //Check All Stored Movies
         let filtered = moviesViewModel.moviesRecored.filter { savedMovieIds.contains($0.id) }
-        print("DEBUG: Filtered movies found: \(filtered.count)")
         
         return filtered
     }
@@ -52,7 +46,7 @@ struct ProfileView: View {
                                     .fill(Color.gray.opacity(0.2))
                                     .frame(width: 60, height: 60)
                                 
-                                Image(user.profileImage ?? "User Avatare")
+                                Image(user.profileImage ?? "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 50, height: 50)
@@ -124,17 +118,13 @@ struct ProfileView: View {
             }
             .onAppear {
                 Task {
-                    print("DEBUG: Starting to load data...")
                     isLoading = true
                     
                     // Load all data concurrently
-                    async let userTask = userViewModel.fetchUser()
-                    async let savedMoviesTask = savedMoviesViewModel.loadSavedMovies()
-                    async let moviesTask = moviesViewModel.loadMovies()
-                    
-                    _ = await (userTask, savedMoviesTask, moviesTask)
-                    
-                    print("DEBUG: All data loaded")
+                    await userViewModel.fetchUser()
+                    await savedMoviesViewModel.loadSavedMovies()
+                    await moviesViewModel.loadMovies()
+
                     isLoading = false
                 }
             }

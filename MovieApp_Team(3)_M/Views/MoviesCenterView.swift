@@ -3,7 +3,7 @@ import SwiftUI
 struct MoviesCenterView: View {
     @State private var searchText = ""
     @StateObject private var viewModel = MoviesViewModel()
-    
+    @StateObject private var DeatailsviewModel = MovieDetailsViewModel()
     
     
     var body: some View {
@@ -13,6 +13,7 @@ struct MoviesCenterView: View {
                 if !searchText.isEmpty {
                     FilteredMovieView(
                         movies: viewModel.movies,
+                        actors: DeatailsviewModel.actorss,
                         searchText: searchText
                     )
                 } else {
@@ -82,6 +83,7 @@ struct HeaderView: View {
 
 struct MoviesCategoryListView: View {
     @StateObject private var viewModel = MoviesViewModel()
+    
 
     var body: some View {
         VStack {
@@ -112,9 +114,21 @@ struct MovieCategorySection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text(category)
-                .font(.system(size: 22, weight: .semibold))
-            
+            HStack{
+                Text(category)
+                    .font(.system(size: 22, weight: .semibold))
+                Spacer()
+                
+                Button {
+                    
+                } label: {
+                    Text("Show more")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.yelloww)
+                }
+
+            }
+                        
             if movies.isEmpty {
                 Text("No \(category.lowercased()) movies found")
                     .foregroundColor(.gray)
@@ -160,10 +174,18 @@ struct MoviePosterCard: View {
 
 struct FilteredMovieView: View {
     let movies: [MoviesInfo]
+    let actors: [ActorFilds]
     let searchText: String
 
     var filteredMovies: [MoviesInfo] {
         movies.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText)
+        }
+    }
+    
+    var filteredActors: [ActorFilds] {
+        actors.filter {
+            searchText.isEmpty ||
             $0.name.localizedCaseInsensitiveContains(searchText)
         }
     }
