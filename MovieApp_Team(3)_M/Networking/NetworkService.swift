@@ -70,7 +70,7 @@ struct NetworkService {
         return result
     }
     
-    static func updateUser(recordId: String, name: String) async throws -> Data {
+    static func updateUser(recordId: String, user : UserInfo) async throws -> Data {
         guard let url = URL(string: GitURL + "/users/\(recordId)") else {
             throw URLError(.badURL)
         }
@@ -80,8 +80,15 @@ struct NetworkService {
         request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        let body: [String: Any] = ["fields": ["name": name]]
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        let body: [String: Any] = [
+            "fields":
+                [
+                "name": user.name,
+                 "password":user.password,
+                 "email": user.email,
+                 "profileImage": user.profileImage
+                      ]]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
         
         let (data, _) = try await URLSession.shared.data(for: request)
         return data

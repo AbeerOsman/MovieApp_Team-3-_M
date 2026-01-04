@@ -90,7 +90,7 @@ struct EditProfileView: View {
                     .cornerRadius(10)
                     .padding(.horizontal)
                     .padding(.top, 20)
-
+                    
                     Button(action: {
                         sessionManager.signOut()
                     }) {
@@ -153,14 +153,19 @@ struct EditProfileView: View {
     }
     
     func saveChanges() async {
-        guard let recordId = sessionManager.userRecordId else { return }
+        guard let recordId = sessionManager.userRecordId else {
+            return
+        }
         
         isSaving = true
         
         let fullName = "\(editedFirstName) \(editedLastName)".trimmingCharacters(in: .whitespaces)
-        
+//        
+//        let user = UserInfo(fullName: fullName, firstName: editedFirstName, lastName: editedLastName, email: user.email,password: user.password, profileImage: user.profileImage)
+//        
+//        
         do {
-            let data = try await NetworkService.updateUser(recordId: recordId, name: fullName)
+            let data = try await NetworkService.updateUser(recordId: recordId, user: user)
             let updated = try JSONDecoder().decode(UserRecord.self, from: data)
             
             sessionManager.currentUser = updated.fields
