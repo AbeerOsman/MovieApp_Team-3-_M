@@ -16,7 +16,6 @@ struct NetworkService {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(APIKey.airtable)",forHTTPHeaderField: "Authorization")
         request.setValue(
             "Bearer \(APIKey.airtable)",
             forHTTPHeaderField: "Authorization"
@@ -37,7 +36,6 @@ struct NetworkService {
     static func directorEndpoint(for movieID: String) -> String {
         return "/movie_directors?filterByFormula=movie_id=\"\(movieID)\""
     }
-
     
     static func reviewEndpoint(for movieID: String) -> String {
         return "/reviews?filterByFormula=movie_id=\"\(movieID)\""
@@ -78,7 +76,7 @@ struct NetworkService {
         }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "PATCH"
+        request.httpMethod = "PUT"
         request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
