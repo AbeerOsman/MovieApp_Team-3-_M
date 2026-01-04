@@ -7,10 +7,13 @@
 //
 import SwiftUI
 struct MoviesDetailsView: View {
-    
-    @State private var showNavTitle = false
-    let movie_id: String
     @StateObject private var vm = MovieDetailsViewModel()
+    @EnvironmentObject var sessionManager: SessionManager
+    @State private var showNavTitle = false
+    @State private var showSaveMovieButton = false
+    @Environment(\.dismiss) var dismiss
+    let movie_id: String
+    
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -66,25 +69,51 @@ struct MoviesDetailsView: View {
             
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    Image(systemName: "chevron.backward")
-                        .foregroundColor(.yelloww)
-                    
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.backward")
+                            .foregroundColor(.yelloww)
+                    }
                 }
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    
-                    Image(systemName: "square.and.arrow.up")
-                        .foregroundColor(.yelloww)
-                    
+                    if
+                        let movie = vm.moviee,
+                        let shareURL = URL(string: movie_id),
+                        let posterURL = URL(string: movie.poster)
+                    {
+                        ShareLink(
+                            item: shareURL,
+                            preview: SharePreview(
+                                "\(movie.name)\n\(movie.genre.joined(separator: " Movie • "))",
+                                image: posterURL
+                            )
+                        ) {
+                            Image(systemName: "square.and.arrow.up")
+                                .foregroundColor(.yelloww)
+                        }
+                    }
+
                 }
+
+                
+                
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    
-                    Image(systemName: "bookmark")
-                        .foregroundColor(.yelloww)
-                    
+                    if let user = sessionManager.userRecordId {
+                        Button {
+                            postSavedMovie(userId: user, movieIds: [movie_id])
+                            showSaveMovieButton = true
+                        } label: {
+                            Image(systemName: showSaveMovieButton ? "bookmark.fill" : "bookmark")
+                                            .foregroundColor(.yelloww)
+                                
+                        }
+                    }
                 }
+
             }
-        }
+        }.navigationBarBackButtonHidden(true)
         
     }
 }
@@ -93,7 +122,7 @@ struct Moviesposter: View {
     let name: String
     
     var body: some View {
-        ZStack() {
+        ZStack {
             AsyncImage(url: URL(string: poster)) { image in
                 if let image = image.image {
                     ZStack{
@@ -115,6 +144,8 @@ struct Moviesposter: View {
                     Text(name)
                         .font(.largeTitle.bold())
                         .foregroundColor(.white)
+                        .padding()
+                        .frame(maxWidth: .infinity, alignment: .bottomLeading)
                     
                 }
                 

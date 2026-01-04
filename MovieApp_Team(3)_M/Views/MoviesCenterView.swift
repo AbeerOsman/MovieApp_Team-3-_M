@@ -47,18 +47,23 @@ struct HeaderView: View {
                             .font(.system(size: 28, weight: .bold))
                         Spacer()
                         if let user = sessionManager.currentUser {
-                            NavigationLink(destination: ProfileView()
-                                .navigationBarBackButtonHidden(true)){
-                                    Circle()
-                                        .fill(Color.gray.opacity(0.2))
-                                        .frame(width: 50, height: 50)
-                                        .overlay(
-                                            Image(user.profileImage ?? "User Avatare")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 40, height: 40)
-                                        )
+                            NavigationLink(
+                                destination: ProfileView()
+                                    .navigationBarBackButtonHidden(true)
+                            ) {
+                                AsyncImage(
+                                    url: URL(string: user.profileImage ??
+                                             "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")
+                                ) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                } placeholder: {
+                                    Color.gray.opacity(0.2)
                                 }
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
+                            }
                         }
                     }
                 

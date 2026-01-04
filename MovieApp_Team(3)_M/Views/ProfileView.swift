@@ -42,14 +42,18 @@ struct ProfileView: View {
                         HStack(spacing: 16) {
                             // Avatar
                             ZStack {
-                                Circle()
-                                    .fill(Color.gray.opacity(0.2))
-                                    .frame(width: 60, height: 60)
-                                
-                                Image(user.profileImage ?? "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 50, height: 50)
+                                AsyncImage(
+                                    url: URL(string: user.profileImage ??
+                                             "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")
+                                ) { image in
+                                    image
+                                        .resizable()
+                                        .scaledToFill()
+                                } placeholder: {
+                                    Color.gray.opacity(0.2)
+                                }
+                                .frame(width: 50, height: 50)
+                                .clipShape(Circle())
                             }
                             
                             // User Info

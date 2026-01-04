@@ -30,15 +30,19 @@ struct EditProfileView: View {
                 
                 if let user = sessionManager.currentUser {
                     ZStack {
-                        Circle()
-                            .fill(Color.gray.opacity(0.2))
-                            .frame(width: 100, height: 100)
-                        
                         if let profileImage = user.profileImage {
-                            Image(profileImage)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
+                            AsyncImage(
+                                url: URL(string: user.profileImage ??
+                                         "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")
+                            ) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                            } placeholder: {
+                                Color.gray.opacity(0.2)
+                            }
+                            .frame(width: 80, height: 80)
+                            .clipShape(Circle())
                         }
                     }
                     .padding(.top, 38)
