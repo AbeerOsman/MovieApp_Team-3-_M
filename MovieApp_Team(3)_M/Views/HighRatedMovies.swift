@@ -26,7 +26,7 @@ struct HighRatedMovies: View {
                 MoviesScrollView(movies: highRatedMovies)
             }
         }
-        .padding(.top, 8)
+        .padding(.top, 24)
         .task {
             await viewModel.loadMovies()
         }
@@ -49,7 +49,7 @@ struct MoviesScrollView: View {
                             MovieCardView(movie: movie)
                  .tag(index)
               }
-                }
+            }.padding(.top, -60)
                .frame(height: 475)
                .tabViewStyle(
                   PageTabViewStyle(indexDisplayMode: .automatic))
