@@ -97,12 +97,21 @@ class SigninViewModel: ObservableObject {
         return result
     }
     
-    private var isValidEmail: Bool {
-        let pattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
-        return NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: email)
+    private func saveSession(for user: UserInfo) {
+        
+        UserDefaults.standard.set(true, forKey: "isLoggedIn")
+        UserDefaults.standard.set(user.email, forKey: "userEmail")
+        UserDefaults.standard.set(user.name ?? "User", forKey: "userName")
+        UserDefaults.standard.set(user.profileImage ?? "", forKey: "userProfileImage")
     }
     
-    private var isValidPassword: Bool {
-        !password.isEmpty
+        private var isValidEmail: Bool {
+            let pattern = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+            return NSPredicate(format: "SELF MATCHES %@", pattern).evaluate(with: email)
+        }
+        
+        private var isValidPassword: Bool {
+            !password.isEmpty
     }
 }
+

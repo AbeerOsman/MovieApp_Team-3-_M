@@ -6,6 +6,7 @@
 //
 
 import Foundation
+
 import Combine
 
 @MainActor
@@ -29,6 +30,7 @@ class UsesViewModel: ObservableObject {
             let endpoint = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users/\(recordId)"
             
             guard let url = URL(string: endpoint) else {
+                //throw UsersError.invalidURL
                 throw SigninError.invalidURL
             }
             
@@ -42,6 +44,7 @@ class UsesViewModel: ObservableObject {
             
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200 else {
+               // throw UsersError.invalidResponse
                 throw SigninError.invalidResponse
             }
             

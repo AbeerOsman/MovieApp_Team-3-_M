@@ -20,14 +20,14 @@ struct MoviesDetailsView: View {
                         name: moviee.name
                     )}
                 
-            VStack(alignment: .leading, spacing: 26) {
-                if let moviee = vm.moviee {
-                    MoviesDetails(
-                        runtime: moviee.runtime,
-                        language: moviee.language.joined(separator: ", "),
-                        genre: moviee.genre.joined(separator: ", "),
-                        age: moviee.rating
-                    )}
+                VStack(alignment: .leading, spacing: 26) {
+                    if let moviee = vm.moviee {
+                        MoviesDetails(
+                            runtime: moviee.runtime,
+                            language: moviee.language.joined(separator: ", "),
+                            genre: moviee.genre.joined(separator: ", "),
+                            age: moviee.rating
+                        )}
                     
                     
                     Divider().foregroundColor(.gray).opacity(0.5)
@@ -54,9 +54,9 @@ struct MoviesDetailsView: View {
                     
                     Reviews()
                     
-                    ReviewsScrollView()
+                    ReviewsScrollView(reviews: vm.reviews)
                     
-                    Reviewbutton()
+                    Reviewbutton(movieID: movie_id)
                 }
                 .padding(.horizontal)
             }
@@ -263,75 +263,84 @@ struct Reviews: View {
         }
     }
 }
-struct ReviewCard: View {
-    @State private var rating = 4
+
+struct ReviewCardView: View {
+    let review: ReviewUIModel
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             
             HStack(spacing: 12) {
-                Image("images-2")
-                    .resizable()
-                    .frame(width: 44, height: 44)
-                    .clipShape(Circle())
+                AsyncImage(url: URL(string: review.userImage)) { phase in
+                    if let image = phase.image {
+                        image.resizable().scaledToFill()
+                    } else if phase.error != nil {
+                        Color.gray
+                    } else {
+                        ProgressView()
+                    }
+                }
+                .frame(width: 44, height: 44)
+                .clipShape(Circle())
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("Afnan Abdullah")
-                    ReviewModelView(rating: $rating)
+                    Text(review.userName)
+                        .font(.subheadline)
+                        .bold()
+                    HStack(spacing: 2) {
+                        ForEach(0..<5) { index in
+                            Image(systemName: index < review.rating ? "star.fill" : "star")
+                                .foregroundColor(.yellow)
+                                .font(.caption)
+                        }
+                    }
                 }
                 Spacer()
             }
             
-            Text("This is an engagingly simple, good-hearted film...")
-            //   .foregroundColor(.white.opacity(0.9))
+            Text(review.text)
+                .font(.body)
             
-            HStack {
-                Spacer()
-                Text("Tuesday")
-                    .foregroundColor(.gray)
-            }
         }
-        .padding(16)
-        .frame(width: 305, height: 188)
+        .padding()
         .background(Color.gray.opacity(0.1))
-        .cornerRadius(18)
+        .cornerRadius(12)
+        .frame(width: 300)
     }
 }
 struct ReviewsScrollView: View {
+    let reviews: [ReviewUIModel]
+    
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 16) {
-                ReviewCard()
-                ReviewCard()
-                ReviewCard()
-                ReviewCard()
+                ForEach(reviews) { review in
+                    ReviewCardView(review: review)
+                }
             }
             .padding(.horizontal)
         }
     }
 }
+
 struct Reviewbutton: View {
+    let movieID: String
+    
     var body: some View {
-        Button(action: {
-            print("Write a review")})
-        {
+        NavigationLink(destination: AddReviewView(movieID: movieID)) {
             HStack {
                 Image(systemName: "square.and.pencil")
-                    .font(.title2)
                 Text("Write a review")
-                    .font(.title2)
-                
-                
             }
-            .foregroundColor(.yelloww)
-            .padding(.vertical, 14)
-            .padding(.horizontal, 18)
+            .foregroundColor(.yellow)
+            .padding()
             .frame(maxWidth: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.yelloww, lineWidth: 2)
+                    .stroke(Color.yellow, lineWidth: 2)
             )
-        }.padding(.horizontal)
+        }
+        .padding(.horizontal)
     }
 }
 #Preview {

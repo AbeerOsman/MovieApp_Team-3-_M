@@ -12,6 +12,7 @@ struct UsersResponse: Codable {
 }
 
 struct UserRecord: Codable, Identifiable {
+    // connected w ReviewRecord
     let id: String
     let fields: UserInfo
 }
@@ -21,13 +22,35 @@ struct UserInfo: Codable {
     let password: String?
     let email: String?
     let profileImage: String?
-    
+
     enum CodingKeys: String, CodingKey {
         case name, password, email
         case profileImage = "profile_image"
     }
 }
 
+struct ReviewResponse: Codable {
+    let records: [ReviewRecord]
+    
+}
+struct ReviewRecord: Codable, Identifiable {
+    let id: String
+    let fields: ReviewInfo
+}
+struct ReviewInfo: Codable {
+    let rate: Int
+    let review_text: String
+    //connected w MovieResponse id
+    let movie_id: String
+    let user_id: String
+}
+struct ReviewUIModel: Identifiable {
+    let id: String
+    let userName: String
+    let userImage: String
+    let rating: Int
+    let text: String
+}
 
 enum SigninError: Error {
     case invalidURL
@@ -55,7 +78,25 @@ enum SigninError: Error {
         case .unknownError:
             return "Something went wrong. Please try again"
         }
+        let name: String
+        let password: String
+        let email: String
+        let profileImage: String
+        
+        enum CodingKeys: String, CodingKey {
+            case name, password, email
+            case profileImage = "profile_image"
+        }
+    }
+    
+    
+    enum UsersError: Error {
+        case invalidURL
+        case invalidResponse
+        case invalidData
+    }
+    
     
     }
     
-}
+
