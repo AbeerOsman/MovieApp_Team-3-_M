@@ -38,7 +38,7 @@ struct MoviesDetailsView: View {
                     Divider().foregroundColor(.gray).opacity(0.5)
                     
                     if let moviee = vm.moviee {
-                        Rating(IMDb_rating: moviee.IMDb_rating )
+                        Rating(IMDb_rating: moviee.IMDbRating )
                         
                     }
                     

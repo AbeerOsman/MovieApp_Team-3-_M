@@ -8,18 +8,19 @@
 import Foundation
 import Combine
 
+
 @MainActor
 class MoviesViewModel: ObservableObject {
-
+    //Initializer
     @Published var movies: [MoviesInfo] = []
     @Published var moviesRecored: [MovieRecord] = []
     @Published var isLoading = false
     @Published var errorMessage: String?
     
-    
+    //computed property
     var uniqueGenres: [String] {
            let allGenres = movies.flatMap { $0.genre }
-           return Array(Set(allGenres)).sorted() // Remove duplicates and sort alphabetically
+           return Array(Set(allGenres)).sorted()
        }
     
     /// Get movies filtered by genre / category
