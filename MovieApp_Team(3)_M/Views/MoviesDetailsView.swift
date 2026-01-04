@@ -343,6 +343,4 @@ struct Reviewbutton: View {
         .padding(.horizontal)
     }
 }
-#Preview {
-    MoviesDetailsView(movie_id: "reckJmZ458CZcLlUd")
-}
+

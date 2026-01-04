@@ -153,17 +153,22 @@ struct EditProfileView: View {
     }
     
     func saveChanges() async {
+       
+
+        
         guard let recordId = sessionManager.userRecordId else {
             return
         }
-        
+        guard let currentuser = sessionManager.currentUser else {
+                return
+            }
         isSaving = true
         
         let fullName = "\(editedFirstName) \(editedLastName)".trimmingCharacters(in: .whitespaces)
-//        
-//        let user = UserInfo(fullName: fullName, firstName: editedFirstName, lastName: editedLastName, email: user.email,password: user.password, profileImage: user.profileImage)
-//        
-//        
+
+        let user = UserInfo(name: fullName,password: currentuser.password,  email: currentuser.email, profileImage: currentuser.profileImage)
+        
+        
         do {
             let data = try await NetworkService.updateUser(recordId: recordId, user: user)
             let updated = try JSONDecoder().decode(UserRecord.self, from: data)

@@ -3,6 +3,8 @@
 //  MovieApp_Team(3)_M
 //
 //  Created by ruam on 11/07/1447 AH.
+//
+
 
 import Foundation
 
@@ -88,6 +90,10 @@ struct NetworkService {
                  "email": user.email,
                  "profileImage": user.profileImage
                       ]]
+//        let body: [String: Any] = ["fields": [
+//            "name": name
+//
+//        ]]
         request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
         
         let (data, _) = try await URLSession.shared.data(for: request)

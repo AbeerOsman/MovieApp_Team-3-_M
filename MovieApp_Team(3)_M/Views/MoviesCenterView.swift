@@ -12,7 +12,7 @@ struct MoviesCenterView: View {
                 
                 if !searchText.isEmpty {
                     FilteredMovieView(
-                        movies: viewModel.movies,
+                        movies: viewModel.moviesRecored,
                         actors: DeatailsviewModel.actorss,
                         searchText: searchText
                     )
@@ -95,7 +95,7 @@ struct MoviesCategoryListView: View {
                             ForEach(viewModel.uniqueGenres, id: \.self) { genre in
                                 MovieCategorySection(
                                     category: genre,
-                                    movies: viewModel.moviesByGenre(genre)
+                                    movies: viewModel.moviesRecored.filter { $0.fields.genre.contains(genre) }
                                 )
                             }
                         }
@@ -110,7 +110,7 @@ struct MoviesCategoryListView: View {
 
 struct MovieCategorySection: View {
     let category: String
-    let movies: [MoviesInfo]
+    let movies: [MovieRecord]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -145,41 +145,47 @@ struct MovieCategorySection: View {
         }
     }
 }
-
 struct MoviePosterCard: View {
-    let movie: MoviesInfo
+    let movie: MovieRecord
 
     var body: some View {
-        VStack(alignment: .leading) {
-            AsyncImage(url: URL(string: movie.poster)) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .overlay(
-                        LinearGradient(
-                            colors: [.black.opacity(0.9), .clear],
-                            startPoint: .bottom,
-                            endPoint: .center
+        NavigationLink(destination: MoviesDetailsView(movie_id: movie.id)) {
+            VStack(alignment: .leading) {
+                AsyncImage(url: URL(string: movie.fields.poster)) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .overlay(
+                            LinearGradient(
+                                colors: [.black.opacity(0.9), .clear],
+                                startPoint: .bottom,
+                                endPoint: .center
+                            )
                         )
-                    )
-            } placeholder: {
-                Color.gray.opacity(0.2)
+                } placeholder: {
+                    Color.gray.opacity(0.2)
+                }
+                .frame(width: 208, height: 275)
+                .clipped()
+                .cornerRadius(8)
+
+                Text(movie.fields.name)
+                    .foregroundColor(.white)
+                    .bold()
             }
-            .frame(width: 208, height: 275)
-            .clipped()
-            .cornerRadius(8)
         }
+        .buttonStyle(PlainButtonStyle())
     }
 }
 
 struct FilteredMovieView: View {
-    let movies: [MoviesInfo]
+    let movies: [MovieRecord]
     let actors: [ActorFilds]
     let searchText: String
 
-    var filteredMovies: [MoviesInfo] {
+    var filteredMovies: [MovieRecord] {
         movies.filter {
-            $0.name.localizedCaseInsensitiveContains(searchText)
+            $0.fields.name.localizedCaseInsensitiveContains(searchText)
         }
     }
     
@@ -208,3 +214,4 @@ struct FilteredMovieView: View {
 #Preview {
     MoviesCenterView()
 }
+
