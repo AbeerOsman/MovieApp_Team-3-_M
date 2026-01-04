@@ -17,6 +17,11 @@ struct NetworkService {
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(APIKey.airtable)",forHTTPHeaderField: "Authorization")
+        request.setValue(
+            "Bearer \(APIKey.airtable)",
+            forHTTPHeaderField: "Authorization"
+        )
+        
         let (data, _) = try await URLSession.shared.data(for: request)
         return data
     }
@@ -32,6 +37,8 @@ struct NetworkService {
     static func directorEndpoint(for movieID: String) -> String {
         return "/movie_directors?filterByFormula=movie_id=\"\(movieID)\""
     }
+
+    
     static func reviewEndpoint(for movieID: String) -> String {
         return "/reviews?filterByFormula=movie_id=\"\(movieID)\""
     }
@@ -39,6 +46,7 @@ struct NetworkService {
     static func userEndpoint() -> String {
         return "/users"
     }
+
     static func postReview(_ review: ReviewInfo) async throws -> ReviewRecord {
         guard let url = URL(string: GitURL + "/reviews") else {
             throw URLError(.badURL)
@@ -62,5 +70,22 @@ struct NetworkService {
         let (data, _) = try await URLSession.shared.data(for: request)
         let result = try JSONDecoder().decode(ReviewRecord.self, from: data)
         return result
+    }
+    
+    static func updateUser(recordId: String, name: String) async throws -> Data {
+        guard let url = URL(string: GitURL + "/users/\(recordId)") else {
+            throw URLError(.badURL)
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "PATCH"
+        request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: Any] = ["fields": ["name": name]]
+        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        
+        let (data, _) = try await URLSession.shared.data(for: request)
+        return data
     }
 }

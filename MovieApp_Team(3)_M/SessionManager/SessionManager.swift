@@ -1,9 +1,9 @@
-//
-//  SessionManager.swift
+// SessionManager.swift
 //  MovieApp_Team(3)_M
 //
 //  Created by Abeer Jeilani Osman  on 11/07/1447 AH.
-//
+// ============================================================
+
 import Foundation
 import Combine
 
@@ -12,18 +12,17 @@ class SessionManager: ObservableObject {
     static let shared = SessionManager()
     
     @Published var currentUser: UserInfo?
-    @Published var userRecordId: String? // This is the Airtable record ID
+    @Published var userRecordId: String?
     @Published var isLoggedIn = false
     
     init() {
-        // Load saved session when app starts
         loadSavedSession()
     }
     
     // MARK: - Save User Session After Sign In
     func saveUserSession(_ user: UserInfo, recordId: String) {
         self.currentUser = user
-        self.userRecordId = recordId // Store the Airtable record ID
+        self.userRecordId = recordId
         self.isLoggedIn = true
         
         // Persist to UserDefaults
@@ -48,7 +47,7 @@ class SessionManager: ObservableObject {
             self.userRecordId = recordId
             self.currentUser = UserInfo(
                 name: name,
-                password: nil, // Never store password
+                password: nil,
                 email: email,
                 profileImage: profileImage
             )
