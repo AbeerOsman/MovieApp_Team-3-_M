@@ -8,11 +8,13 @@
 import SwiftUI
 struct MoviesDetailsView: View {
     @StateObject private var vm = MovieDetailsViewModel()
+    @StateObject private var saveVM = PostSavedMoviesViewModel()
     @EnvironmentObject var sessionManager: SessionManager
     @State private var showNavTitle = false
     @State private var showSaveMovieButton = false
     @Environment(\.dismiss) var dismiss
     let movie_id: String
+    
     
     var body: some View {
         NavigationStack {
@@ -65,6 +67,10 @@ struct MoviesDetailsView: View {
             }
             .task {
                 await vm.load_movie(movieID: movie_id)
+                // Check if movie is already saved
+                if let user = sessionManager.userRecordId {
+                    saveVM.checkIfMovieSaved(userId: user, movieId: movie_id)
+                }
             }
             
             .toolbar {
@@ -94,24 +100,23 @@ struct MoviesDetailsView: View {
                                 .foregroundColor(.yelloww)
                         }
                     }
-
+                    
                 }
-
+                
                 
                 
                 ToolbarItem(placement: .navigationBarTrailing) {
+                    // Save/Bookmark button
                     if let user = sessionManager.userRecordId {
                         Button {
-                            postSavedMovie(userId: user, movieIds: [movie_id])
-                            showSaveMovieButton = true
+                            saveVM.postSavedMovie(userId: user, movieId: movie_id)
                         } label: {
-                            Image(systemName: showSaveMovieButton ? "bookmark.fill" : "bookmark")
-                                            .foregroundColor(.yelloww)
-                                
+                            Image(systemName: saveVM.isSaved ? "bookmark.fill" : "bookmark")
+                                .foregroundColor(.yelloww)
                         }
                     }
                 }
-
+                
             }
         }.navigationBarBackButtonHidden(true)
         

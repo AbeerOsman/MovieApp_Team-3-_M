@@ -15,6 +15,9 @@ class MovieDetailsViewModel: ObservableObject {
     @Published var director: DirectorFields?
     @Published var reviews: [ReviewUIModel] = []
     @Published var allUsers: [UserRecord] = []
+    @Published var isSaved = false
+    @Published var isLoading = false
+    @Published var errorMessage: String?
     
     func load_movie(movieID: String) async {
         await fetch_movie(movieID: movieID)
