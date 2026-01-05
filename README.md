@@ -11,25 +11,25 @@ Table of Contents
 This project demonstrates a fully functional movie application with user authentication, movie discovery, review management, and personalized saving features. The application follows the MVVM (Model-View-ViewModel) architectural pattern and leverages async/await for efficient asynchronous network requests.
 Features
 
-# User Authentication: Sign in with email and password validation
-# Movie Browsing: Discover movies filtered by genre and category
+User Authentication: Sign in with email and password validation
+Movie Browsing: Discover movies filtered by genre and category
 Movie Details: View comprehensive movie information including cast, director, and ratings
 Review System: Read user reviews and submit your own ratings and comments
 Saved Movies: Save favorite movies for quick access
 User Profile Management: Update user information and profile picture
 Session Persistence: Automatic session management with UserDefaults
 
-Architecture
+# Architecture
 The application follows the MVVM (Model-View-ViewModel) pattern:
 
-Models: Define data structures that mirror the Airtable API responses
-ViewModels: Handle business logic and data fetching operations
-Views: SwiftUI views that display data and handle user interactions
-Services: Centralized network and session management
+- Models: Define data structures that mirror the Airtable API responses
+- ViewModels: Handle business logic and data fetching operations
+- Views: SwiftUI views that display data and handle user interactions
+- Services: Centralized network and session management
 
-CRUD Operations & API Integration
+# CRUD Operations & API Integration
 All communication with the Airtable API is handled through the NetworkService class, which provides a centralized interface for HTTP requests. The application implements the following CRUD operations:
-Create (POST)
+# Create (POST)
 1. Post Review
 swift// File: NetworkService.swift
 static func postReview(_ review: ReviewInfo) async throws -> ReviewRecord
@@ -60,7 +60,7 @@ movie_id: Array of movie IDs to save
 
 Implementation: Triggered when user clicks the save button on movie details
 
-Read (GET)
+# Read (GET)
 1. Fetch All Movies
 swift// File: MoviesViewModel.swift
 private func getMoviesRecords() async throws -> [MovieRecord]
@@ -127,7 +127,7 @@ Endpoint: GET /saved_movies?filterByFormula=AND(...)
 Purpose: Verifies if a specific movie is already saved by the user
 Updates: isSaved published property for UI binding
 
-Update (PUT)
+# Update (PUT)
 1. Update User Profile
 swift// File: NetworkService.swift
 static func updateUser(recordId: String, user: UserInfo) async throws -> Data
