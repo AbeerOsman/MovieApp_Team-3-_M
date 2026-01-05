@@ -9,10 +9,10 @@
 import Foundation
 
 struct NetworkService {
-    private static let GitURL = "https://api.airtable.com/v0/appsfcB6YESLj4NCN"
+    private static let baseURL = "https://api.airtable.com/v0/appsfcB6YESLj4NCN"
     
     static func fetch(_ endpoint: String) async throws -> Data {
-        guard let url = URL(string: GitURL + endpoint) else {
+        guard let url = URL(string: baseURL + endpoint) else {
             throw URLError(.badURL)
         }
         
@@ -62,7 +62,7 @@ struct NetworkService {
 
     // MARK: - POST Requests
     static func postReview(_ review: ReviewInfo) async throws -> ReviewRecord {
-        guard let url = URL(string: GitURL + "/reviews") else {
+        guard let url = URL(string: baseURL + "/reviews") else {
             throw URLError(.badURL)
         }
         
@@ -88,7 +88,7 @@ struct NetworkService {
     
     // MARK: - PUT Requests
     static func updateUser(recordId: String, user : UserInfo) async throws -> Data {
-        guard let url = URL(string: GitURL + "/users/\(recordId)") else {
+        guard let url = URL(string: baseURL + "/users/\(recordId)") else {
             throw URLError(.badURL)
         }
         
@@ -111,7 +111,7 @@ struct NetworkService {
         return data
     }
     static func deleteReview(reviewId: String) async throws {
-           guard let url = URL(string: GitURL + "/reviews/\(reviewId)") else {
+           guard let url = URL(string: baseURL + "/reviews/\(reviewId)") else {
                throw URLError(.badURL)
            }
 
