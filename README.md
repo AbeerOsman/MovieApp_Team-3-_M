@@ -10,15 +10,16 @@ Table of Contents
 
 # Overview
 This project demonstrates a fully functional movie application with user authentication, movie discovery, review management, and personalized saving features. The application follows the MVVM (Model-View-ViewModel) architectural pattern and leverages async/await for efficient asynchronous network requests.
-Features
 
-User Authentication: Sign in with email and password validation
-Movie Browsing: Discover movies filtered by genre and category
-Movie Details: View comprehensive movie information including cast, director, and ratings
-Review System: Read user reviews and submit your own ratings and comments
-Saved Movies: Save favorite movies for quick access
-User Profile Management: Update user information and profile picture
-Session Persistence: Automatic session management with UserDefaults
+# Features
+
+- User Authentication: Sign in with email and password validation
+- Movie Browsing: Discover movies filtered by genre and category
+- Movie Details: View comprehensive movie information including cast, director, and ratings
+- Review System: Read user reviews and submit your own ratings and comments
+- Saved Movies: Save favorite movies for quick access
+- User Profile Management: Update user information and profile picture
+- Session Persistence: Automatic session management with UserDefaults
 
 # Architecture
 The application follows the MVVM (Model-View-ViewModel) pattern:
