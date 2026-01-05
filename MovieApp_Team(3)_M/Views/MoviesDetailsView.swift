@@ -59,8 +59,9 @@ struct MoviesDetailsView: View {
                     
                     Reviews()
                     
-                    ReviewsScrollView(reviews: vm.reviews)
-                    
+                    ReviewsScrollView(reviews: vm.reviews) { review in
+                        vm.deleteReview(review)
+                    }
                     Reviewbutton(movieID: movie_id)
                 }
                 .padding(.horizontal)
@@ -299,7 +300,8 @@ struct Reviews: View {
 
 struct ReviewCardView: View {
     let review: ReviewUIModel
-    
+    let onDelete: (ReviewUIModel) -> Void
+    @EnvironmentObject var sessionManager: SessionManager
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             
@@ -329,13 +331,21 @@ struct ReviewCardView: View {
                     }
                 }
                 Spacer()
-            }
-            
-            Text(review.text)
-                .font(.body)
-            
-        }
-        .padding()
+                if review.userId == sessionManager.userRecordId {
+                                    Button {
+                                        onDelete(review)
+                                    } label: {
+                                        Image(systemName: "trash")
+                                            .foregroundColor(.red)
+                                    }
+                                }
+                            }
+                            
+                            Text(review.text)
+                                .font(.body)
+                            
+                        }
+                        .padding()
         .background(Color.gray.opacity(0.1))
         .cornerRadius(12)
         .frame(width: 300)
@@ -343,12 +353,12 @@ struct ReviewCardView: View {
 }
 struct ReviewsScrollView: View {
     let reviews: [ReviewUIModel]
-    
+    let onDelete: (ReviewUIModel) -> Void
     var body: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 16) {
                 ForEach(reviews) { review in
-                    ReviewCardView(review: review)
+                    ReviewCardView(review: review, onDelete: onDelete)
                 }
             }
             .padding(.horizontal)
@@ -376,3 +386,4 @@ struct Reviewbutton: View {
         .padding(.horizontal)
     }
 }
+

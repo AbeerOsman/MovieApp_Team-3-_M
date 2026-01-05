@@ -125,7 +125,8 @@ class MovieDetailsViewModel: ObservableObject {
                         userName: userRecord.fields.name ?? "Unknown",
                         userImage: userRecord.fields.profileImage ?? "",
                         rating: record.fields.rate,
-                        text: record.fields.review_text
+                        text: record.fields.review_text,
+                        userId: record.fields.user_id
                     )
                     uiReviews.append(reviewUI)
                     print("User found for review: \(userRecord.fields.name ?? "Unknown")")
@@ -136,7 +137,8 @@ class MovieDetailsViewModel: ObservableObject {
                         userName: "Unknown",
                         userImage: "",
                         rating: record.fields.rate,
-                        text: record.fields.review_text
+                        text: record.fields.review_text,
+                        userId: record.fields.user_id 
                     )
                     uiReviews.append(reviewUI)
                 }
@@ -150,4 +152,16 @@ class MovieDetailsViewModel: ObservableObject {
             errorMessage = "Failed to load reviews"
         }
     }
+    func deleteReview(_ review: ReviewUIModel) {
+            Task {
+                do {
+                    try await NetworkService.deleteReview(reviewId: review.id)
+                    print("Deleted review:", review.id)
+                    reviews.removeAll { $0.id == review.id }
+                } catch {
+                    print("Failed to delete:", error)
+                }
+            }
+        }
+
 }

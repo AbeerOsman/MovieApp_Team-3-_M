@@ -1,8 +1,7 @@
 // SessionManager.swift
 //  MovieApp_Team(3)_M
 //
-//  Created by Abeer Jeilani Osman  on 11/07/1447 AH.
-// ============================================================
+// Created by Abeer Jeilani Osman on 11/07/1447 AH.
 
 import Foundation // for using UserDefaults
 import Combine    // for using ObservableObject + Published
@@ -27,12 +26,22 @@ class SessionManager: ObservableObject {
         self.userRecordId = recordId
         self.isLoggedIn = true
         
-        // Persist to UserDefaults
+        updateUserDefaults(user: user)
+        
+        // Persist session state
         UserDefaults.standard.set(true, forKey: "isLoggedIn")
         UserDefaults.standard.set(recordId, forKey: "userRecordId")
+    }
+    
+    // MARK: - Update UserDefaults
+    func updateUserDefaults(user: UserInfo) {
         UserDefaults.standard.set(user.email, forKey: "userEmail")
         UserDefaults.standard.set(user.name ?? "User", forKey: "userName")
         UserDefaults.standard.set(user.profileImage ?? "", forKey: "userProfileImage")
+        
+        if let password = user.password {
+            UserDefaults.standard.set(password, forKey: "userPassword")
+        }
     }
     
     // Load Saved Session on App Start
@@ -45,12 +54,13 @@ class SessionManager: ObservableObject {
             
             let name = UserDefaults.standard.string(forKey: "userName")
             let profileImage = UserDefaults.standard.string(forKey: "userProfileImage")
+            let password = UserDefaults.standard.string(forKey: "userPassword")
             
             //re-create the user from saved data
             self.userRecordId = recordId
             self.currentUser = UserInfo(
                 name: name,
-                password: nil,
+                password: password,
                 email: email,
                 profileImage: profileImage
             )
@@ -69,5 +79,6 @@ class SessionManager: ObservableObject {
         UserDefaults.standard.removeObject(forKey: "userEmail")
         UserDefaults.standard.removeObject(forKey: "userName")
         UserDefaults.standard.removeObject(forKey: "userProfileImage")
+        UserDefaults.standard.removeObject(forKey: "userPassword")
     }
 }
