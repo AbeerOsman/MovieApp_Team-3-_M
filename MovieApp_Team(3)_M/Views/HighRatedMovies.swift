@@ -10,8 +10,8 @@ import SwiftUI
 struct HighRatedMovies: View {
     @StateObject private var viewModel = MoviesViewModel()
 
-    var highRatedMovies: [MoviesInfo] {
-        viewModel.movies.filter { $0.imdbRating > 5 }
+    var highRatedMovies: [MovieRecord] {
+        viewModel.moviesRecored.filter { $0.fields.imdbRating > 5 }
     }
 
     var body: some View {
@@ -38,26 +38,31 @@ struct HighRatedMovies: View {
 }
 
 struct MoviesScrollView: View {
-    let movies: [MoviesInfo]
-    
+    let movies: [MovieRecord]
     @State private var selectedMovieIndex = 0
     
     var body: some View {
         VStack {
             TabView(selection: $selectedMovieIndex) {
-             ForEach(Array(movies.enumerated()), id: \.element.id) { index, movie in
-                            MovieCardView(movie: movie)
-                 .tag(index)
-              }
-            }.padding(.top, -60)
-               .frame(height: 475)
-               .tabViewStyle(
-                  PageTabViewStyle(indexDisplayMode: .automatic))
+                ForEach(Array(movies.enumerated()), id: \.element.id) { index, movie in
+                    
+                    NavigationLink(
+                        destination: MoviesDetailsView(movie_id: movie.id)
+                    ) {
+                        MovieCardView(movie: movie.fields)
+                    }
+                    .buttonStyle(.plain)
+                    .tag(index)
+                }
+            }
+            .padding(.top, -60)
+            .frame(height: 475)
+            .tabViewStyle(
+                PageTabViewStyle(indexDisplayMode: .automatic)
+            )
         }
     }
 }
-
-
 
 struct MovieCardView: View {
     let movie: MoviesInfo
@@ -101,7 +106,6 @@ struct MovieCardView: View {
     }
 }
 
-
 struct MovieInfoView: View {
     let movie: MoviesInfo
 
@@ -130,7 +134,6 @@ struct MovieInfoView: View {
     }
 }
 
-
 struct RatingStarsView: View {
     let rating: Double
     
@@ -138,11 +141,10 @@ struct RatingStarsView: View {
         let highlightedStars = starsCount(from: rating)
         HStack {
             ForEach(1...5, id: \.self) { index in
-              Image(systemName: "star.fill")
-                 .foregroundColor(index <= highlightedStars ? .yellow : .gray)
-                 .font(.system(size: 8))
-                
-             }
+                Image(systemName: "star.fill")
+                    .foregroundColor(index <= highlightedStars ? .yellow : .gray)
+                    .font(.system(size: 8))
+            }
         }
     }
 }
@@ -164,14 +166,12 @@ func starsCount(from rating: Double) -> Int {
     }
 }
 
-
 struct LoadingView: View {
     var body: some View {
         ProgressView()
             .padding(100)
     }
 }
-
 
 struct EmptyStateView: View {
     let message: String
@@ -183,7 +183,6 @@ struct EmptyStateView: View {
     }
 }
 
-
 struct SectionTitle: View {
     let title: String
     var body: some View {
@@ -191,4 +190,3 @@ struct SectionTitle: View {
             .font(.system(size: 22, weight: .semibold))
     }
 }
-
