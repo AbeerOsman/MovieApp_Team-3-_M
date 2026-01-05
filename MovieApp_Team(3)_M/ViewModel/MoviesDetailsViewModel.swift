@@ -20,26 +20,27 @@ class MovieDetailsViewModel: ObservableObject {
     @Published var errorMessage: String?
     
     func load_movie(movieID: String) async {
+        isLoading = true
         await fetch_movie(movieID: movieID)
         await fetch_actors(movieID: movieID)
         await fetch_director(movieID: movieID)
-        await fetchAllUsers()
-        await fetchReviews(movieID: movieID)
+        await fetchAllUsers()  // Load users first
+        await fetchReviews(movieID: movieID)  // Then fetch reviews
+        isLoading = false
     }
     
     private func fetch_movie(movieID: String) async {
         do {
             let endpoint = NetworkService.movieEndpoint(for: movieID)
             let data = try await NetworkService.fetch(endpoint)
-            //       print(String(data: data, encoding: .utf8),"‼️")
             let response = try JSONDecoder().decode(MovieResponse.self, from: data)
             self.moviee = response.fields
         } catch {
             print("Movie fetch error:", error)
+            errorMessage = "Failed to load movie details"
         }
     }
     
-    //MORE DETAILS I DONT LIKE ITTTT
     private func fetch_actors(movieID: String) async {
         do {
             let endpoint = NetworkService.actorsEndpoint(for: movieID)
@@ -50,7 +51,8 @@ class MovieDetailsViewModel: ObservableObject {
             
             for record in response.records {
                 let actorID = record.fields.actor_id
-                let actorData = try await NetworkService.fetch("/movie_actors/\(actorID)")
+                let actorEndpoint = NetworkService.actorDetailEndpoint(for: actorID)
+                let actorData = try await NetworkService.fetch(actorEndpoint)
                 let actorResponse = try JSONDecoder().decode(ActorResponse.self, from: actorData)
                 actors.append(actorResponse.fields)
             }
@@ -72,8 +74,8 @@ class MovieDetailsViewModel: ObservableObject {
             
             if let firstRecord = response.records.first {
                 let directorID = firstRecord.fields.director_id
-                
-                let directorData = try await NetworkService.fetch("/movie_directors/\(directorID)")
+                let directorEndpoint = NetworkService.directorDetailEndpoint(for: directorID)
+                let directorData = try await NetworkService.fetch(directorEndpoint)
                 let directorResponse = try JSONDecoder().decode(DirectorResponse.self, from: directorData)
                 self.director = directorResponse.fields
             }
@@ -82,25 +84,41 @@ class MovieDetailsViewModel: ObservableObject {
             print("Director fetch error:", error)
         }
     }
+    
     private func fetchAllUsers() async {
         do {
             let data = try await NetworkService.fetch(NetworkService.userEndpoint())
             let response = try JSONDecoder().decode(UsersResponse.self, from: data)
             self.allUsers = response.records
+            print("Loaded \(response.records.count) users")
         } catch {
             print("Fetch all users error:", error)
+            errorMessage = "Failed to load users"
         }
     }
     
-    //  Fetch reviews
     private func fetchReviews(movieID: String) async {
         do {
-            let data = try await NetworkService.fetch(NetworkService.reviewEndpoint(for: movieID))
+            let endpoint = NetworkService.reviewEndpoint(for: movieID)
+            print("📍 Fetching reviews from endpoint: \(endpoint)")
+            
+            let data = try await NetworkService.fetch(endpoint)
+            
+            // Print raw JSON for debugging
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("📦 Raw response: \(jsonString)")
+            }
+            
             let response = try JSONDecoder().decode(ReviewResponse.self, from: data)
+            
+            print("✅ Fetched \(response.records.count) reviews for movie \(movieID)")
+            print("👥 Total users loaded: \(allUsers.count)")
             
             var uiReviews: [ReviewUIModel] = []
             
             for record in response.records {
+                print("🔍 Processing review ID: \(record.id), User ID: \(record.fields.user_id)")
+                
                 if let userRecord = allUsers.first(where: { $0.id == record.fields.user_id }) {
                     let reviewUI = ReviewUIModel(
                         id: record.id,
@@ -110,8 +128,9 @@ class MovieDetailsViewModel: ObservableObject {
                         text: record.fields.review_text
                     )
                     uiReviews.append(reviewUI)
+                    print("✅ User found for review: \(userRecord.fields.name ?? "Unknown")")
                 } else {
-                    // fallback if user not found
+                    print("⚠️ User NOT found for review with ID: \(record.fields.user_id)")
                     let reviewUI = ReviewUIModel(
                         id: record.id,
                         userName: "Unknown",
@@ -124,10 +143,11 @@ class MovieDetailsViewModel: ObservableObject {
             }
             
             self.reviews = uiReviews
+            print("🎬 Final: Processed \(uiReviews.count) reviews with user data")
             
         } catch {
-            print("Review fetch error:", error)
+            print("❌ Review fetch error:", error)
+            errorMessage = "Failed to load reviews"
         }
     }
 }
-  

@@ -12,7 +12,7 @@ import Combine
 @MainActor
 class AddReviewViewModel: ObservableObject {
     @Published var reviewText: String = ""
-    @Published var rating: Int = 1
+    @Published var rating: Double = 1
     @Published var isSubmitting: Bool = false
     @Published var errorMessage: String?
     
@@ -45,7 +45,7 @@ class AddReviewViewModel: ObservableObject {
 }
 
 struct ReviewModelView : View {
-    @Binding var rating: Int
+    @Binding var rating: Double
     var label = ""
     var maximumRating: Int = 5
     var offImage: Image = Image(systemName: "star")
@@ -58,10 +58,11 @@ struct ReviewModelView : View {
                 Text(label)}
             ForEach(1...maximumRating, id: \.self){ number in
                 Button {
-                    rating = number
+                    rating = Double(number)
                 } label: {
                     image(for: number)
-                        .foregroundStyle(number > rating ? offColor : onColor)
+                        .foregroundStyle(Double(number) > rating ? offColor : onColor)
+
                 }
                 
             }
@@ -69,8 +70,8 @@ struct ReviewModelView : View {
         .buttonStyle(.plain)
     }
     func image(for number : Int) ->Image {
-        if number > rating {
-            offImage /*?? onImage*/
+        if Double(number) > rating {
+            offImage
         } else {
             onImage
         }

@@ -325,7 +325,7 @@ struct ReviewCardView: View {
                         .bold()
                     HStack(spacing: 2) {
                         ForEach(0..<5) { index in
-                            Image(systemName: index < review.rating ? "star.fill" : "star")
+                            Image(systemName: index < Int(review.rating) ? "star.fill" : "star")
                                 .foregroundColor(.yellow)
                                 .font(.caption)
                         }
@@ -379,4 +379,3 @@ struct Reviewbutton: View {
         .padding(.horizontal)
     }
 }
-

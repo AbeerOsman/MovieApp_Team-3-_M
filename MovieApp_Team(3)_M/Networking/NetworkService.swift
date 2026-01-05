@@ -27,26 +27,40 @@ struct NetworkService {
         return data
     }
     
+    // MARK: - Movie Endpoints
     static func movieEndpoint(for movieID: String) -> String {
         return "/movies/\(movieID)"
     }
     
+    // MARK: - Actor Endpoints
     static func actorsEndpoint(for movieID: String) -> String {
         return "/movie_actors?filterByFormula=movie_id=\"\(movieID)\""
     }
     
+    static func actorDetailEndpoint(for actorID: String) -> String {
+        return "/movie_actors/\(actorID)"
+    }
+    
+    // MARK: - Director Endpoints
     static func directorEndpoint(for movieID: String) -> String {
         return "/movie_directors?filterByFormula=movie_id=\"\(movieID)\""
     }
     
+    static func directorDetailEndpoint(for directorID: String) -> String {
+        return "/movie_directors/\(directorID)"
+    }
+    
+    // MARK: - Review Endpoints
     static func reviewEndpoint(for movieID: String) -> String {
         return "/reviews?filterByFormula=movie_id=\"\(movieID)\""
     }
     
+    // MARK: - User Endpoints
     static func userEndpoint() -> String {
         return "/users"
     }
 
+    // MARK: - POST Requests
     static func postReview(_ review: ReviewInfo) async throws -> ReviewRecord {
         guard let url = URL(string: GitURL + "/reviews") else {
             throw URLError(.badURL)
@@ -72,6 +86,7 @@ struct NetworkService {
         return result
     }
     
+    // MARK: - PUT Requests
     static func updateUser(recordId: String, user : UserInfo) async throws -> Data {
         guard let url = URL(string: GitURL + "/users/\(recordId)") else {
             throw URLError(.badURL)
@@ -83,17 +98,13 @@ struct NetworkService {
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
         let body: [String: Any] = [
-            "fields":
-                [
+            "fields": [
                 "name": user.name,
-                 "password":user.password,
-                 "email": user.email,
-                 "profileImage": user.profileImage
-                      ]]
-//        let body: [String: Any] = ["fields": [
-//            "name": name
-//
-//        ]]
+                "password": user.password,
+                "email": user.email,
+                "profileImage": user.profileImage
+            ]
+        ]
         request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
         
         let (data, _) = try await URLSession.shared.data(for: request)
