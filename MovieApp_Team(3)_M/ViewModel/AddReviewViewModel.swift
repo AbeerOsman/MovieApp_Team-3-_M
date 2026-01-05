@@ -34,11 +34,11 @@ class AddReviewViewModel: ObservableObject {
             user_id: userID
         )
         
-        do {_ = try await NetworkService.postReview(review)
+        do {
+            _ = try await ReviewAPI.postReview(review)
             return true
         } catch {
             errorMessage = error.localizedDescription
-            print("Post review error:", error)
             return false
         }
     }

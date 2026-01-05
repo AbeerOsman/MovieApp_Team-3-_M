@@ -4,129 +4,82 @@
 //
 //  Created by ruam on 11/07/1447 AH.
 //
-
-
 import Foundation
+
+enum HTTPMethod: String {
+    case GET, POST, PUT, DELETE
+}
+
+enum NetworkError: Error {
+    case badURL
+    case badResponse
+    case decodingError
+    case encodingError
+}
 
 struct NetworkService {
     private static let baseURL = "https://api.airtable.com/v0/appsfcB6YESLj4NCN"
     
+    // Core Request Method
+    private static func request(
+        endpoint: String,
+        method: HTTPMethod = .GET,
+        body: Data? = nil
+    ) async throws -> Data {
+        
+        let urlString = baseURL + endpoint
+        guard let url = URL(string: urlString) else {
+            print("Bad URL: \(urlString)")
+            throw NetworkError.badURL
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = method.rawValue
+        request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
+        
+        if let body = body {
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            request.httpBody = body
+        }
+        
+        print("Request: \(method.rawValue) \(url.absoluteString)")
+        
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            print("Invalid response type")
+            throw NetworkError.badResponse
+        }
+        
+        print("Response Status: \(httpResponse.statusCode)")
+        
+        guard httpResponse.statusCode == 200 else {
+            if let responseString = String(data: data, encoding: .utf8) {
+                print("Error Response: \(responseString)")
+            }
+            throw NetworkError.badResponse
+        }
+        
+        return data
+    }
+    
+    //GET Request
     static func fetch(_ endpoint: String) async throws -> Data {
-        guard let url = URL(string: baseURL + endpoint) else {
-            throw URLError(.badURL)
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue(
-            "Bearer \(APIKey.airtable)",
-            forHTTPHeaderField: "Authorization"
-        )
-        
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return data
+        return try await request(endpoint: endpoint, method: .GET)
     }
     
-    // MARK: - Movie Endpoints
-    static func movieEndpoint(for movieID: String) -> String {
-        return "/movies/\(movieID)"
+    // POST Request
+    static func post(_ endpoint: String, body: Data) async throws -> Data {
+        return try await request(endpoint: endpoint, method: .POST, body: body)
     }
     
-    // MARK: - Actor Endpoints
-    static func actorsEndpoint(for movieID: String) -> String {
-        return "/movie_actors?filterByFormula=movie_id=\"\(movieID)\""
+    // PUT Request
+    static func put(_ endpoint: String, body: Data) async throws -> Data {
+        return try await request(endpoint: endpoint, method: .PUT, body: body)
     }
     
-    static func actorDetailEndpoint(for actorID: String) -> String {
-        return "/movie_actors/\(actorID)"
+    // DELETE Request
+    static func delete(_ endpoint: String) async throws {
+        _ = try await request(endpoint: endpoint, method: .DELETE)
     }
-    
-    // MARK: - Director Endpoints
-    static func directorEndpoint(for movieID: String) -> String {
-        return "/movie_directors?filterByFormula=movie_id=\"\(movieID)\""
-    }
-    
-    static func directorDetailEndpoint(for directorID: String) -> String {
-        return "/movie_directors/\(directorID)"
-    }
-    
-    // MARK: - Review Endpoints
-    static func reviewEndpoint(for movieID: String) -> String {
-        return "/reviews?filterByFormula=movie_id=\"\(movieID)\""
-    }
-    
-    // MARK: - User Endpoints
-    static func userEndpoint() -> String {
-        return "/users"
-    }
-
-    // MARK: - POST Requests
-    static func postReview(_ review: ReviewInfo) async throws -> ReviewRecord {
-        guard let url = URL(string: baseURL + "/reviews") else {
-            throw URLError(.badURL)
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-        let body: [String: Any] = [
-            "fields": [
-                "rate": review.rate,
-                "review_text": review.review_text,
-                "movie_id": review.movie_id,
-                "user_id": review.user_id
-            ]
-        ]
-        request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-        
-        let (data, _) = try await URLSession.shared.data(for: request)
-        let result = try JSONDecoder().decode(ReviewRecord.self, from: data)
-        return result
-    }
-    
-    // MARK: - PUT Requests
-    static func updateUser(recordId: String, user : UserInfo) async throws -> Data {
-        guard let url = URL(string: baseURL + "/users/\(recordId)") else {
-            throw URLError(.badURL)
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "PUT"
-        request.setValue("Bearer \(APIKey.airtable)", forHTTPHeaderField: "Authorization")
-        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        
-        let body: [String: Any] = [
-            "fields": [
-                "name": user.name,
-                "password": user.password,
-                "email": user.email,
-                "profileImage": user.profileImage
-            ]
-        ]
-        request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-        
-        let (data, _) = try await URLSession.shared.data(for: request)
-        return data
-    }
-    static func deleteReview(reviewId: String) async throws {
-           guard let url = URL(string: baseURL + "/reviews/\(reviewId)") else {
-               throw URLError(.badURL)
-           }
-
-           var request = URLRequest(url: url)
-           request.httpMethod = "DELETE"
-           request.setValue(
-               "Bearer \(APIKey.airtable)",
-               forHTTPHeaderField: "Authorization"
-           )
-
-           let (_, response) = try await URLSession.shared.data(for: request)
-
-           guard let httpResponse = response as? HTTPURLResponse,
-                 httpResponse.statusCode == 200 else {
-               throw URLError(.badServerResponse)
-           }
-       }
 }

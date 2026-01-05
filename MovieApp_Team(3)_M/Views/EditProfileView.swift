@@ -4,6 +4,7 @@
 //  Created by Shaikha Alnashri on 04/07/1447 AH.
 
 import SwiftUI
+import PhotosUI
 
 struct EditProfileView: View {
     @Environment(\.dismiss) var dismiss
@@ -12,6 +13,11 @@ struct EditProfileView: View {
     @State private var editedFirstName = ""
     @State private var editedLastName = ""
     @State private var isSaving = false
+    
+    // Photo picker properties
+    @State private var selectedPhotoItem: PhotosPickerItem?
+    @State private var selectedPhotoData: Data?
+    @State private var isUploadingImage = false
     
     private var firstName: String {
         let fullName = sessionManager.currentUser?.name ?? ""
@@ -29,8 +35,18 @@ struct EditProfileView: View {
             VStack(spacing: 20) {
                 
                 if let user = sessionManager.currentUser {
+                    // Profile Image with Photo Picker
                     ZStack {
-                        if let profileImage = user.profileImage {
+                        if let imageData = selectedPhotoData,
+                           let uiImage = UIImage(data: imageData) {
+                            // Show selected image
+                            Image(uiImage: uiImage)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 80, height: 80)
+                                .clipShape(Circle())
+                        } else {
+                            // Show current profile image
                             AsyncImage(
                                 url: URL(string: user.profileImage ??
                                          "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")
@@ -44,8 +60,29 @@ struct EditProfileView: View {
                             .frame(width: 80, height: 80)
                             .clipShape(Circle())
                         }
+                        
+                        // Show camera icon when editing
+                        if isEditing {
+                            Circle()
+                                .fill(Color.black.opacity(0.5))
+                                .frame(width: 80, height: 80)
+                            
+                            PhotosPicker(selection: $selectedPhotoItem,
+                                         matching: .images) {
+                                Image(systemName: "camera.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.yellow)
+                            }
+                        }
                     }
                     .padding(.top, 38)
+                    .onChange(of: selectedPhotoItem) { oldValue, newValue in
+                        Task {
+                            if let data = try? await newValue?.loadTransferable(type: Data.self) {
+                                selectedPhotoData = data
+                            }
+                        }
+                    }
                     
                     VStack(spacing: 0) {
                         HStack(spacing: 60) {
@@ -121,6 +158,8 @@ struct EditProfileView: View {
                 Button(action: {
                     if isEditing {
                         isEditing = false
+                        selectedPhotoData = nil
+                        selectedPhotoItem = nil
                     } else {
                         dismiss()
                     }
@@ -146,6 +185,7 @@ struct EditProfileView: View {
                             .font(.system(size: 16, weight: .medium))
                     }
                 }
+                .disabled(isSaving)
             }
         }
     }
@@ -154,33 +194,55 @@ struct EditProfileView: View {
         isEditing = true
         editedFirstName = firstName
         editedLastName = lastName
+        selectedPhotoData = nil
+        selectedPhotoItem = nil
     }
     
     func saveChanges() async {
-       
-
-        
         guard let recordId = sessionManager.userRecordId else {
             return
         }
-        guard let currentuser = sessionManager.currentUser else {
-                return
-            }
+        guard let currentUser = sessionManager.currentUser else {
+            return
+        }
+        
         isSaving = true
         
         let fullName = "\(editedFirstName) \(editedLastName)".trimmingCharacters(in: .whitespaces)
-
-        let user = UserInfo(name: fullName,password: currentuser.password,  email: currentuser.email, profileImage: currentuser.profileImage)
         
+        var imageUrl = currentUser.profileImage ?? ""
+        
+        // Upload image if user selected one
+        if let photoData = selectedPhotoData {
+            isUploadingImage = true
+            do {
+                imageUrl = try await ImageAPI.uploadToImgur(imageData: photoData)
+            } catch {
+                print("Error uploading image: \(error)")
+                isSaving = false
+                isUploadingImage = false
+                return
+            }
+            isUploadingImage = false
+        }
+        
+        let user = UserInfo(
+            name: fullName,
+            password: currentUser.password,
+            email: currentUser.email,
+            profileImage: imageUrl
+        )
         
         do {
-            let data = try await NetworkService.updateUser(recordId: recordId, user: user)
+            let data = try await UserAPI.updateUser(id: recordId, user: user)
             let updated = try JSONDecoder().decode(UserRecord.self, from: data)
             
             sessionManager.currentUser = updated.fields
-            UserDefaults.standard.set(fullName, forKey: "userName")
+            sessionManager.updateUserDefaults(user: updated.fields)
             
             isEditing = false
+            selectedPhotoData = nil
+            selectedPhotoItem = nil
         } catch {
             print("Error updating profile: \(error)")
         }

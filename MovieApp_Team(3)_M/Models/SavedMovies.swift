@@ -4,6 +4,8 @@
 //
 //  Created by Abeer Jeilani Osman  on 10/07/1447 AH.
 //
+//
+//
 
 import Foundation
 
@@ -17,8 +19,8 @@ struct SavedMoviesRecord: Codable, Identifiable {
 }
 
 struct SavedMoviesData: Codable {
-    let userId: String
-    let movieId: [String]
+    let userId: String?
+    let movieId: [String]?
 
     enum CodingKeys: String, CodingKey {
         case userId = "user_id"
@@ -33,4 +35,3 @@ enum SavedMoviesError: Error {
     case invalidResponse
     case invalidData
 }
-

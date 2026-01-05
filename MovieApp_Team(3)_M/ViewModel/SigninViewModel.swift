@@ -74,27 +74,7 @@ class SigninViewModel: ObservableObject {
     }
     
     private func fetchUsers() async throws -> UsersResponse {
-        let endpoint = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/users"
-        
-        guard let url = URL(string: endpoint) else {
-            throw SigninError.invalidURL
-        }
-        
-        var request = URLRequest(url: url)
-        request.setValue(
-            "Bearer \(APIKey.airtable)",
-            forHTTPHeaderField: "Authorization"
-        )
-        
-        let (data, response) = try await URLSession.shared.data(for: request)
-        
-        guard let httpResponse = response as? HTTPURLResponse,
-              httpResponse.statusCode == 200 else {
-            throw SigninError.invalidResponse
-        }
-        
-        let result = try JSONDecoder().decode(UsersResponse.self, from: data)
-        return result
+        return try await UserAPI.fetchUsers()
     }
     
     private func saveSession(for user: UserInfo) {

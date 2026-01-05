@@ -13,17 +13,17 @@ struct ProfileView: View {
             print("DEBUG: No user record ID")
             return []
         }
-        //Check saved movies for this current user of App
+        
+        // Check saved movies for this current user of App
         let savedMovieIds = savedMoviesViewModel.savedMovies
             .filter { $0.userId == recordId }
-            .flatMap { $0.movieId }
-       
-        //Check All Stored Movies
+            .flatMap { $0.movieId ?? [] }  // ← Add ?? [] here to flatten properly
+        
+        // Check All Stored Movies
         let filtered = moviesViewModel.moviesRecored.filter { savedMovieIds.contains($0.id) }
         
         return filtered
     }
-    
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 10) {
