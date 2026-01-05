@@ -6,6 +6,7 @@ Table of Contents
 # Features
 # Architecture
 # CRUD Operations & API Integration
+# Setup Instructions
 
 # Overview
 This project demonstrates a fully functional movie application with user authentication, movie discovery, review management, and personalized saving features. The application follows the MVVM (Model-View-ViewModel) architectural pattern and leverages async/await for efficient asynchronous network requests.
@@ -147,3 +148,21 @@ Implementation: Called from user settings/profile edit views
 # Delete (DELETE)
 Deleting reviews
 Account deletion
+
+# Setup Instructions
+Configuration
+
+- Add API Token to Info.plist:
+Open Info.plist
+Add a new key: MoviesAPIToken
+Set the value to your Airtable API token
+- create local .gitingnor: 
+echo "Secrets.xcconfig" >> .gitignore
+git add .gitignore
+git commit -m "Add Secrets.xcconfig to gitignore"
+git push origin main
+- pass the Token 
+- ⁠Create a local Secrets.xcconfig file with your new token:
+cat > Secrets.xcconfig << EOF
+APIToken = your_new_token_here
+EOF
