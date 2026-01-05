@@ -103,13 +103,10 @@ struct MoviesDetailsView: View {
                     
                 }
                 
-                
-                
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    // Save/Bookmark button
                     if let user = sessionManager.userRecordId {
                         Button {
-                            saveVM.postSavedMovie(userId: user, movieId: movie_id)
+                            saveVM.toggleSaveMovie(userId: user, movieId: movie_id)
                         } label: {
                             Image(systemName: saveVM.isSaved ? "bookmark.fill" : "bookmark")
                                 .foregroundColor(.yelloww)

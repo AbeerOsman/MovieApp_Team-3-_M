@@ -1,267 +1,107 @@
-//
-//  PostSavedMoviesViewModel.swift
-//  MovieApp_Team(3)_M
-//
-
 import Foundation
 import Combine
 
 @MainActor
 class PostSavedMoviesViewModel: ObservableObject {
     @Published var isSaved = false
+    private let baseURL = "https://api.airtable.com/v0/appsfcB6YESLj4NCN/saved_movies"
     
-    // Check if movie is already saved
-    func checkIfMovieSaved(userId: String, movieId: String) {
-        guard let url = URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/saved_movies?filterByFormula=AND({user_id}='\(userId)',FIND('\(movieId)',{movie_id}))") else {
-            print("Invalid URL")
-            return
-        }
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        if let apiKey = Bundle.main.object(forInfoDictionaryKey: "MoviesAPIToken") as? String {
-            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        } else {
-            print("API Key not found")
-            return
-        }
-        
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-            DispatchQueue.main.async {
-                if let error = error {
-                    print("Error checking saved: \(error.localizedDescription)")
-                    return
-                }
-                
-                if let data = data {
-                    do {
-                        let decoder = JSONDecoder()
-                        let response = try decoder.decode(SavedMoviesResponse.self, from: data)
-                        self?.isSaved = !response.records.isEmpty
-                        print("Movie saved status: \(self?.isSaved ?? false)")
-                    } catch {
-                        print("Failed to decode: \(error)")
-                    }
-                }
-            }
-        }.resume()
+    private var token: String {
+        Bundle.main.object(forInfoDictionaryKey: "MoviesAPIToken") as? String ?? ""
     }
     
-    // Save movie
-    func postSavedMovie(userId: String, movieId: String) {
-        guard let url = URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/saved_movies") else {
-            print("Invalid URL")
-            return
+    // Check if movie is saved
+    func checkIfMovieSaved(userId: String, movieId: String) {
+        getUser(userId: userId) { record in
+            let savedMovies = record?["movie_id"] as? [String] ?? []
+            self.isSaved = savedMovies.contains(movieId)
         }
+    }
+    
+    // Add or remove movie
+    func toggleSaveMovie(userId: String, movieId: String) {
+        getUser(userId: userId) { record in
+            if let recordId = record?["id"] as? String {
+                // User exists - update their record
+                self.updateUser(recordId: recordId, userId: userId, movieId: movieId)
+            } else {
+                // New user - create record
+                self.createUser(userId: userId, movieId: movieId)
+            }
+        }
+    }
+    
+    // Get user's saved movies
+    private func getUser(userId: String, completion: @escaping ([String: Any]?) -> Void) {
+        let url = baseURL + "?filterByFormula={user_id}='\(userId)'"
+        
+        apiCall(url: url, method: "GET") { data in
+            let record = self.parseRecords(data).first
+            completion(record)
+        }
+    }
+    
+    // Update user's movies (add/remove)
+    private func updateUser(recordId: String, userId: String, movieId: String) {
+        getUser(userId: userId) { record in
+            var movies = record?["movie_id"] as? [String] ?? []
+            
+            if movies.contains(movieId) {
+                movies.removeAll { $0 == movieId }  // Remove
+            } else {
+                movies.append(movieId)  // Add
+            }
+            
+            let body = ["fields": ["user_id": userId, "movie_id": movies]]
+            self.apiCall(url: self.baseURL + "/" + recordId, method: "PATCH", body: body) { _ in
+                self.isSaved.toggle()
+            }
+        }
+    }
+    
+    // Create new user record
+    private func createUser(userId: String, movieId: String) {
+        let body = ["fields": ["user_id": userId, "movie_id": [movieId]]]
+        
+        apiCall(url: baseURL, method: "POST", body: body) { _ in
+            self.isSaved = true
+        }
+    }
+    
+    // Parse API response , converts raw API data -> JSON -> usable records
+    private func parseRecords(_ data: Data) -> [[String: Any]] {
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let records = json["records"] as? [[String: Any]] else {
+            return []
+        }
+        
+        return records.compactMap { record in
+            var result = record["fields"] as? [String: Any] ?? [:]
+            ///Airtable record ID is outside fields, We add it manually so we don’t lose it
+            result["id"] = record["id"]
+            return result
+        }
+    }
+    
+    // Make API request
+    private func apiCall(url: String, method: String, body: [String: Any]? = nil, completion: @escaping (Data) -> Void) {
+        guard let url = URL(string: url) else { return }
         
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+        request.httpMethod = method
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
-        if let apiKey = Bundle.main.object(forInfoDictionaryKey: "MoviesAPIToken") as? String {
-            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-        } else {
-            print("API Key not found")
-            return
+        if let body = body {
+            request.httpBody = try? JSONSerialization.data(withJSONObject: body)
         }
         
-//        let requestBody: [String: Any] = [
-//            "records": [
-//                [
-//                    "fields": [
-//                        "user_id": userId,
-//                        "movie_id": [movieId]
-//                    ]
-//                ]
-//            ]
-//        ]
-        
-        let requestBody: [String: Any] = [
-                    "fields": [
-                        "user_id": userId,
-                        "movie_id": [movieId]
-                    ]
-                ]
-        
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: requestBody)
-            request.httpBody = jsonData
-            
-            if let jsonString = String(data: jsonData, encoding: .utf8) {
-                print("Sending JSON: \(jsonString)")
-            }
-        } catch {
-            print("Failed to encode: \(error)")
-            return
-        }
-        
-        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+        URLSession.shared.dataTask(with: request) { data, _, _ in
             DispatchQueue.main.async {
-                if let error = error {
-                    print("Error: \(error.localizedDescription)")
-                    return
-                }
-                
-                if let httpResponse = response as? HTTPURLResponse {
-                    print("Status code: \(httpResponse.statusCode)")
-                    
-                    if let data = data {
-                        if let jsonString = String(data: data, encoding: .utf8) {
-                            print("Response: \(jsonString)")
-                        }
-                    }
-                    
-                    if httpResponse.statusCode == 200 {
-                        print("Movie saved successfully!")
-                        self?.isSaved = true
-                    }
+                if let data = data {
+                    completion(data)
                 }
             }
         }.resume()
     }
 }
-
-//@MainActor
-//class PostSavedMoviesViewModel: ObservableObject {
-//    @Published var isSaved = false
-//    
-//    func postSavedMovie(userId: String, movieId: String) {
-//        // 1. Airtable URL
-//        guard let url = URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/saved_movies") else {
-//            print("Invalid URL")
-//            return
-//        }
-//        
-//        // 2. Create URLRequest
-//        var request = URLRequest(url: url)
-//        request.httpMethod = "POST"
-//        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//        
-//        // 3. Add Authorization header
-//        if let apiKey = Bundle.main.object(forInfoDictionaryKey: "MoviesAPIToken") as? String {
-//            request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-//        } else {
-//            print("API Key not found")
-//            return
-//        }
-//        
-//        // 4. Prepare data with correct format
-//        let requestBody: [String: Any] = [
-//            "fields": [
-//                "user_id": userId,
-//                "movie_id": [movieId]
-//            ]
-//        ]
-//        
-//        do {
-//            let jsonData = try JSONSerialization.data(withJSONObject: requestBody)
-//            request.httpBody = jsonData
-//        } catch {
-//            print("Failed to encode: \(error)")
-//            return
-//        }
-//        
-//        // 5. Send request
-//        URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-//            DispatchQueue.main.async {
-//                if let error = error {
-//                    print("Error: \(error.localizedDescription)")
-//                    return
-//                }
-//                
-//                if let httpResponse = response as? HTTPURLResponse {
-//                    if httpResponse.statusCode == 200 {
-//                        print("Movie saved successfully!")
-//                        self?.isSaved = true
-//                    } else {
-//                        print("Status code: \(httpResponse.statusCode)")
-//                    }
-//                }
-//            }
-//        }.resume()
-//    }
-//}
-
-
-/* ANOTHER WAY TO DO IT
- 
- //
- //  PostSavedMoviesViewModel.swift
- //  MovieApp_Team(3)_M
- //
-
- import Foundation
-
- @MainActor
- class PostSavedMoviesViewModel: ObservableObject {
-     @Published var isSaved = false
-     
-     func postSavedMovie(userId: String, movieId: String) {
-         guard let url = URL(string: "https://api.airtable.com/v0/appsfcB6YESLj4NCN/saved_movies") else {
-             print("Invalid URL")
-             return
-         }
-         
-         var request = URLRequest(url: url)
-         request.httpMethod = "POST"
-         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-         
-         if let apiKey = Bundle.main.object(forInfoDictionaryKey: "MoviesAPIToken") as? String {
-             request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
-         } else {
-             print("API Key not found")
-             return
-         }
-         
-         // IMPORTANT: Airtable requires "records" wrapper
-         let requestBody: [String: Any] = [
-             "records": [
-                 [
-                     "fields": [
-                         "user_id": userId,
-                         "movie_id": [movieId]
-                     ]
-                 ]
-             ]
-         ]
-         
-         do {
-             let jsonData = try JSONSerialization.data(withJSONObject: requestBody)
-             request.httpBody = jsonData
-             
-             // DEBUG: Print what we're sending
-             if let jsonString = String(data: jsonData, encoding: .utf8) {
-                 print("Sending JSON: \(jsonString)")
-             }
-         } catch {
-             print("Failed to encode: \(error)")
-             return
-         }
-         
-         URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
-             DispatchQueue.main.async {
-                 if let error = error {
-                     print("Error: \(error.localizedDescription)")
-                     return
-                 }
-                 
-                 if let httpResponse = response as? HTTPURLResponse {
-                     print("Status code: \(httpResponse.statusCode)")
-                     
-                     if let data = data {
-                         if let jsonString = String(data: data, encoding: .utf8) {
-                             print("Response: \(jsonString)")
-                         }
-                     }
-                     
-                     if httpResponse.statusCode == 200 {
-                         print(" Movie saved successfully!")
-                         self?.isSaved = true
-                     }
-                 }
-             }
-         }.resume()
-     }
- }
- */

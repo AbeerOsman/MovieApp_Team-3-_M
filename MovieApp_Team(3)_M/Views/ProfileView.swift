@@ -2,7 +2,7 @@ import SwiftUI
 
 struct ProfileView: View {
     @Environment(\.dismiss) var dismiss
-    @StateObject private var userViewModel = UsesViewModel()
+    ///@StateObject private var userViewModel = UsesViewModel()
     @StateObject var moviesViewModel = MoviesViewModel()
     @StateObject private var savedMoviesViewModel = SavedMoviesViewModle()
     @EnvironmentObject var sessionManager: SessionManager
@@ -16,8 +16,8 @@ struct ProfileView: View {
         //Check saved movies for this current user of App
         let savedMovieIds = savedMoviesViewModel.savedMovies
             .filter { $0.userId == recordId }
-            .flatMap { $0.movieId }
-       
+            .flatMap { $0.movieId ?? [] }
+        
         //Check All Stored Movies
         let filtered = moviesViewModel.moviesRecored.filter { savedMovieIds.contains($0.id) }
         
@@ -92,8 +92,8 @@ struct ProfileView: View {
                         ProgressView()
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     } else if !currentUserSavedMovies.isEmpty {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
+                        ScrollView(.vertical, showsIndicators: false) {
+                            VStack(spacing: 15) {
                                 ForEach(currentUserSavedMovies) { movieRecord in
                                     SavedMoviePosterCard(movie: movieRecord.fields)
                                 }
@@ -125,10 +125,10 @@ struct ProfileView: View {
                     isLoading = true
                     
                     // Load all data concurrently
-                    await userViewModel.fetchUser()
+                    //await userViewModel.fetchUser()
                     await savedMoviesViewModel.loadSavedMovies()
                     await moviesViewModel.loadMovies()
-
+                    
                     isLoading = false
                 }
             }
@@ -146,7 +146,7 @@ struct ProfileView: View {
 
 struct SavedMoviePosterCard: View {
     let movie: MoviesInfo
-
+    
     var body: some View {
         VStack(alignment: .leading) {
             AsyncImage(url: URL(string: movie.poster)) { image in
@@ -172,6 +172,4 @@ struct SavedMoviePosterCard: View {
 
 #Preview {
     ProfileView()
-        .environmentObject(SessionManager())
-        .preferredColorScheme(.dark)
 }

@@ -19,7 +19,7 @@ struct MoviesCenterView: View {
                 } else {
                     VStack(spacing: 24) {
                         HighRatedMovies()
-
+                        
                         MoviesCategoryListView()
                     }
                 }
@@ -40,47 +40,47 @@ struct HeaderView: View {
     @EnvironmentObject var sessionManager: SessionManager
     
     var body: some View {
-            VStack(spacing: 16) {
-                
-                    HStack {
-                        Text("Movies Center")
-                            .font(.system(size: 28, weight: .bold))
-                        Spacer()
-                        if let user = sessionManager.currentUser {
-                            NavigationLink(
-                                destination: ProfileView()
-                                    .navigationBarBackButtonHidden(true)
-                            ) {
-                                AsyncImage(
-                                    url: URL(string: user.profileImage ??
-                                             "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")
-                                ) { image in
-                                    image
-                                        .resizable()
-                                        .scaledToFill()
-                                } placeholder: {
-                                    Color.gray.opacity(0.2)
-                                }
-                                .frame(width: 50, height: 50)
-                                .clipShape(Circle())
-                            }
+        VStack(spacing: 16) {
+            
+            HStack {
+                Text("Movies Center")
+                    .font(.system(size: 28, weight: .bold))
+                Spacer()
+                if let user = sessionManager.currentUser {
+                    NavigationLink(
+                        destination: ProfileView()
+                            .navigationBarBackButtonHidden(true)
+                    ) {
+                        AsyncImage(
+                            url: URL(string: user.profileImage ??
+                                     "https://i.pinimg.com/736x/00/47/00/004700cb81873e839ceaadf9f3c1fb28.jpg")
+                        ) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                        } placeholder: {
+                            Color.gray.opacity(0.2)
                         }
+                        .frame(width: 50, height: 50)
+                        .clipShape(Circle())
                     }
-                
-                HStack {
-                    Image(systemName: "magnifyingglass")
-                        .foregroundColor(.gray)
-                    TextField("Search for movie name, actors ...", text: $searchText)
                 }
-                .padding(8)
-                .background(Color(.systemGray6))
-                .cornerRadius(12)
-            }.background(
-                Rectangle()
-                    .fill(Color(.black))
-                    .frame(height: 125)
-                    .ignoresSafeArea()
-            )
+            }
+            
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(.gray)
+                TextField("Search for movie name, actors ...", text: $searchText)
+            }
+            .padding(8)
+            .background(Color(.systemGray6))
+            .cornerRadius(12)
+        }.background(
+            Rectangle()
+                .fill(Color(.black))
+                .frame(height: 125)
+                .ignoresSafeArea()
+        )
         
         
     }
@@ -89,34 +89,34 @@ struct HeaderView: View {
 struct MoviesCategoryListView: View {
     @StateObject private var viewModel = MoviesViewModel()
     
-
+    
     var body: some View {
         VStack {
-                    if viewModel.isLoading {
-                        ProgressView()
-                            .padding(100)
-                    } else {
-                        VStack(spacing: 24) {
-                            ForEach(viewModel.uniqueGenres, id: \.self) { genre in
-                                MovieCategorySection(
-                                    category: genre,
-                                    movies: viewModel.moviesRecored.filter { $0.fields.genre.contains(genre) }
-                                )
-                            }
-                        }
-                        .padding(.top, 24)
+            if viewModel.isLoading {
+                ProgressView()
+                    .padding(100)
+            } else {
+                VStack(spacing: 24) {
+                    ForEach(viewModel.uniqueGenres, id: \.self) { genre in
+                        MovieCategorySection(
+                            category: genre,
+                            movies: viewModel.moviesRecored.filter { $0.fields.genre.contains(genre) }
+                        )
                     }
                 }
-                .task {
-                    await viewModel.loadMovies()
-                }
+                .padding(.top, 24)
+            }
+        }
+        .task {
+            await viewModel.loadMovies()
+        }
     }
 }
 
 struct MovieCategorySection: View {
     let category: String
     let movies: [MovieRecord]
-
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             HStack{
@@ -131,9 +131,9 @@ struct MovieCategorySection: View {
                         .font(.system(size: 16, weight: .semibold))
                         .foregroundColor(.yelloww)
                 }
-
+                
             }
-                        
+            
             if movies.isEmpty {
                 Text("No \(category.lowercased()) movies found")
                     .foregroundColor(.gray)
@@ -152,7 +152,7 @@ struct MovieCategorySection: View {
 }
 struct MoviePosterCard: View {
     let movie: MovieRecord
-
+    
     var body: some View {
         NavigationLink(destination: MoviesDetailsView(movie_id: movie.id)) {
             VStack(alignment: .leading) {
@@ -173,7 +173,7 @@ struct MoviePosterCard: View {
                 .frame(width: 208, height: 275)
                 .clipped()
                 .cornerRadius(8)
-
+                
                 Text(movie.fields.name)
                     .foregroundColor(.white)
                     .bold()
@@ -187,7 +187,7 @@ struct FilteredMovieView: View {
     let movies: [MovieRecord]
     let actors: [ActorFilds]
     let searchText: String
-
+    
     var filteredMovies: [MovieRecord] {
         movies.filter {
             $0.fields.name.localizedCaseInsensitiveContains(searchText)
@@ -200,7 +200,7 @@ struct FilteredMovieView: View {
             $0.name.localizedCaseInsensitiveContains(searchText)
         }
     }
-
+    
     var body: some View {
         if filteredMovies.isEmpty {
             Text("No results found")

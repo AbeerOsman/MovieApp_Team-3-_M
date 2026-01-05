@@ -23,10 +23,10 @@ class MoviesViewModel: ObservableObject {
            return Array(Set(allGenres)).sorted()
        }
     
-    /// Get movies filtered by genre / category
-    func moviesByGenre(_ genre: String) -> [MoviesInfo] {
-        movies.filter { $0.genre.contains(genre) }
-    }
+//    /// Get movies filtered by genre / category
+//    func moviesByGenre(_ genre: String) -> [MoviesInfo] {
+//        movies.filter { $0.genre.contains(genre) }
+//    }
 
 
     // Load movies
@@ -62,7 +62,7 @@ class MoviesViewModel: ObservableObject {
         )
         // Call network
         let (data, response) = try await URLSession.shared.data(for: request)
-      //  print(String(data: data, encoding: .utf8),"⌚️")
+
         // Check HTTP response
         guard let httpResponse = response as? HTTPURLResponse,
               httpResponse.statusCode == 200 else {

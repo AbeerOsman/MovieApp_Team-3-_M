@@ -22,7 +22,7 @@ class SavedMoviesViewModle: ObservableObject {
             savedMovies = try await getSavedMovies()
             print("Loaded saved movies: \(savedMovies.count) records")
             for movie in savedMovies {
-                print("  User: \(movie.userId), Movie IDs: \(movie.movieId)")
+                print("  User: \(movie.userId ?? "nil"), Movie IDs: \(movie.movieId ?? [])")
             }
         } catch {
             errorMessage = error.localizedDescription
@@ -48,6 +48,9 @@ class SavedMoviesViewModle: ObservableObject {
         let decoder = JSONDecoder()
         let savedMoviesResponse = try decoder.decode(SavedMoviesResponse.self, from: data)
         
-        return savedMoviesResponse.records.map { $0.fields }
+        // Filter out records with missing userId or movieId
+        return savedMoviesResponse.records
+            .map { $0.fields }
+            .filter { $0.userId != nil && $0.movieId != nil }
     }
 }

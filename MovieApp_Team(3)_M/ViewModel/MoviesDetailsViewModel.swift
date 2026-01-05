@@ -100,24 +100,24 @@ class MovieDetailsViewModel: ObservableObject {
     private func fetchReviews(movieID: String) async {
         do {
             let endpoint = NetworkService.reviewEndpoint(for: movieID)
-            print("📍 Fetching reviews from endpoint: \(endpoint)")
+            print("Fetching reviews from endpoint: \(endpoint)")
             
             let data = try await NetworkService.fetch(endpoint)
             
             // Print raw JSON for debugging
             if let jsonString = String(data: data, encoding: .utf8) {
-                print("📦 Raw response: \(jsonString)")
+                print("Raw response: \(jsonString)")
             }
             
             let response = try JSONDecoder().decode(ReviewResponse.self, from: data)
             
-            print("✅ Fetched \(response.records.count) reviews for movie \(movieID)")
-            print("👥 Total users loaded: \(allUsers.count)")
+            print("Fetched \(response.records.count) reviews for movie \(movieID)")
+            print("Total users loaded: \(allUsers.count)")
             
             var uiReviews: [ReviewUIModel] = []
             
             for record in response.records {
-                print("🔍 Processing review ID: \(record.id), User ID: \(record.fields.user_id)")
+                print("Processing review ID: \(record.id), User ID: \(record.fields.user_id)")
                 
                 if let userRecord = allUsers.first(where: { $0.id == record.fields.user_id }) {
                     let reviewUI = ReviewUIModel(
@@ -128,9 +128,9 @@ class MovieDetailsViewModel: ObservableObject {
                         text: record.fields.review_text
                     )
                     uiReviews.append(reviewUI)
-                    print("✅ User found for review: \(userRecord.fields.name ?? "Unknown")")
+                    print("User found for review: \(userRecord.fields.name ?? "Unknown")")
                 } else {
-                    print("⚠️ User NOT found for review with ID: \(record.fields.user_id)")
+                    print("User NOT found for review with ID: \(record.fields.user_id)")
                     let reviewUI = ReviewUIModel(
                         id: record.id,
                         userName: "Unknown",
@@ -143,10 +143,10 @@ class MovieDetailsViewModel: ObservableObject {
             }
             
             self.reviews = uiReviews
-            print("🎬 Final: Processed \(uiReviews.count) reviews with user data")
+            print("Final: Processed \(uiReviews.count) reviews with user data")
             
         } catch {
-            print("❌ Review fetch error:", error)
+            print("Review fetch error:", error)
             errorMessage = "Failed to load reviews"
         }
     }

@@ -4,14 +4,15 @@
 //  Created by Abeer Jeilani Osman  on 11/07/1447 AH.
 // ============================================================
 
-import Foundation
-import Combine
+import Foundation // for using UserDefaults
+import Combine    // for using ObservableObject + Published
 
 @MainActor
+
 class SessionManager: ObservableObject {
-    //Only one session manager exists +  Used everywhere in the app
+    // Only one session manager exists +  Used everywhere in the app
     static let shared = SessionManager()
-    
+    // SwiftUI will automatically update the UI when these data changes
     @Published var currentUser: UserInfo?
     @Published var userRecordId: String?
     @Published var isLoggedIn = false
@@ -20,7 +21,7 @@ class SessionManager: ObservableObject {
         loadSavedSession()
     }
     
-    // MARK: - Save User Session After Sign In
+    // Save User Session After Sign In
     func saveUserSession(_ user: UserInfo, recordId: String) {
         self.currentUser = user
         self.userRecordId = recordId
@@ -34,8 +35,8 @@ class SessionManager: ObservableObject {
         UserDefaults.standard.set(user.profileImage ?? "", forKey: "userProfileImage")
     }
     
-    // MARK: - Load Saved Session on App Start
-    private func loadSavedSession() {
+    // Load Saved Session on App Start
+     func loadSavedSession() {
         let isLoggedIn = UserDefaults.standard.bool(forKey: "isLoggedIn")
         
         if isLoggedIn,
@@ -45,6 +46,7 @@ class SessionManager: ObservableObject {
             let name = UserDefaults.standard.string(forKey: "userName")
             let profileImage = UserDefaults.standard.string(forKey: "userProfileImage")
             
+            //re-create the user from saved data
             self.userRecordId = recordId
             self.currentUser = UserInfo(
                 name: name,
