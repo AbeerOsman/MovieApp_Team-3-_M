@@ -147,8 +147,30 @@ profileImage: Profile picture URL
 Implementation: Called from user settings/profile edit views
 
 # Delete (DELETE)
-Deleting reviews
-Account deletion
+1. Delete Review  
+swift  
+// File: MovieDetailsViewModel.swift  
+func deleteReview(_ review: ReviewUIModel)
+
+Endpoint: DELETE /reviews/{reviewId}
+
+Purpose: Deletes a user review for a specific movie
+
+Implementation:
+- Triggered when the user taps the delete (trash) icon on their own review
+- The request is sent via NetworkService
+- Upon successful deletion, the review is removed from the local UI state
+
+Network Layer:  
+swift  
+// File: NetworkService.swift  
+static func deleteReview(reviewId: String) async throws
+
+Behavior:
+- Sends a DELETE request to the Airtable reviews endpoint
+- Validates HTTP response status code
+- Throws an error if deletion fails
+
 
 # Setup Instructions
 Configuration
