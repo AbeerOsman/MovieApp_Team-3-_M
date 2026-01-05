@@ -110,4 +110,23 @@ struct NetworkService {
         let (data, _) = try await URLSession.shared.data(for: request)
         return data
     }
+    static func deleteReview(reviewId: String) async throws {
+           guard let url = URL(string: GitURL + "/reviews/\(reviewId)") else {
+               throw URLError(.badURL)
+           }
+
+           var request = URLRequest(url: url)
+           request.httpMethod = "DELETE"
+           request.setValue(
+               "Bearer \(APIKey.airtable)",
+               forHTTPHeaderField: "Authorization"
+           )
+
+           let (_, response) = try await URLSession.shared.data(for: request)
+
+           guard let httpResponse = response as? HTTPURLResponse,
+                 httpResponse.statusCode == 200 else {
+               throw URLError(.badServerResponse)
+           }
+       }
 }

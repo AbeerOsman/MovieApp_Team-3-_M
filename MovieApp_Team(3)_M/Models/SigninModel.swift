@@ -51,6 +51,7 @@ struct ReviewUIModel: Identifiable {
     let userImage: String
     let rating: Double
     let text: String
+    let userId: String?
 }
 
 enum SigninError: Error {
